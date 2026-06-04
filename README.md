@@ -1,4 +1,4 @@
-# 🦐 Crustea EBII · Pro Command Center
+# 🦐 EBII System Crustea
 
 [![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20ESP32-blue.svg)](https://github.com/)
 [![Database](https://img.shields.io/badge/Database-Firebase%20RTDB-orange.svg)](https://firebase.google.com/)
