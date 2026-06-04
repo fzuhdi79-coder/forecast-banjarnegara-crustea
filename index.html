@@ -260,7 +260,7 @@ body {
           <div id="hwDot" class="dot off"></div>
           <span id="hwStatus">Menghubungkan...</span>
         </div>
-        </div>
+      </div>
     </div>
 
     <div class="ai-box">
@@ -318,7 +318,7 @@ body {
       <div class="card p-0" style="padding:0; overflow:hidden;">
         <div style="padding:1.5rem; border-bottom:1px solid var(--border);">
           <h3 style="font-weight:600; color:var(--text);">Oksigen Terlarut (DO)</h3>
-          <p style="font-size:0.85rem; color:var(--text-2);">Target: > 4.5 mg/L | Ideal: 5 - 7 mg/L</p>
+          <p style="font-size:0.85rem; color:var(--text-2);">Target: &gt; 4.5 mg/L | Ideal: 5 - 7 mg/L</p>
         </div>
         <div class="chart-container">
           <canvas id="chartDO"></canvas>
@@ -412,7 +412,7 @@ function getWibDate() {
 async function doLogin() {
   let emRaw = document.getElementById('inEmail').value;
   let pwRaw = document.getElementById('inPass').value;
-  
+   
   const em = emRaw.replace(/[^\x20-\x7E]/g, '').trim();
   const pw = pwRaw.replace(/[^\x20-\x7E]/g, '').trim();
 
@@ -540,7 +540,7 @@ function toggleRelay() {
   db.ref('forecast/status').set(next);
 }
 
-// ── REAL-TIME LISTENER DATA TELEMETRI ──
+// ── REAL-TIME LISTENER DATA TELEMETRI (FIXED & STRUKTUR SESUAI FIREBASE) ──
 function listenTelemetry() {
   const wib = getWibDate();
   const mm = String(wib.getMonth()+1).padStart(2,'0');
@@ -548,22 +548,28 @@ function listenTelemetry() {
   let yymmdd = `${wib.getFullYear()}-${mm}-${dd}`;
   let yymm = `${wib.getFullYear()}-${mm}`;
 
-  let url = `${FB}forecast_2026/${yymm}/${yymmdd}.json?auth=${authToken}&_nocache=${cb}`;
-  let r = await fetch(url, { cache: 'no-store' });
-  
   if (currentTelemetryRef) {
-    currentTelemetryRef.off(); // Detach listener lama saat berganti hari
+    currentTelemetryRef.off(); // Bersihkan listener lama agar tidak memory leak
   }
 
-  currentTelemetryRef = db.ref(`forecast/${yymmdd}`);
+  // ✨ Menggunakan Path Firebase Terstruktur: forecast_2026/YYYY-MM/YYYY-MM-DD
+  currentTelemetryRef = db.ref(`forecast_2026/${yymm}/${yymmdd}`);
   currentTelemetryRef.on('value', (snapshot) => {
     let data = snapshot.val();
     
-    // Fallback jika hari baru belum ada data masuk dari node lapangan
+    // Fallback otomatis jika folder tanggal hari ini belum dibuat di Firebase lapangan
     if (!data) {
-      db.ref('forecast/2024-08-20').once('value', (fallbackSnapshot) => {
+      db.ref('forecast_2024/2024-08/2024-08-20').once('value', (fallbackSnapshot) => {
         const fallbackData = fallbackSnapshot.val();
-        if (fallbackData) processTelemetryData(fallbackData, "2024-08-20");
+        if (fallbackData) {
+          processTelemetryData(fallbackData, "2024-08-20");
+        } else {
+          // Fallback kedua ke folder forecast lama jika ada
+          db.ref(`forecast/${yymmdd}`).once('value', (oldSnapshot) => {
+            const oldData = oldSnapshot.val();
+            if (oldData) processTelemetryData(oldData, yymmdd);
+          });
+        }
       });
       return;
     }
@@ -576,7 +582,7 @@ function processTelemetryData(data, dateKey) {
   const keys = Object.keys(data).sort((a, b) => a.localeCompare(b, undefined, {numeric: true})); 
   const recentKeys = keys.slice(-25); 
   
-  let lbls=[], vDO=[], vPH=[], vSU=[], vSA=[];
+  let lbls=[], vDO=[], vPH=[], vSU=[], vSA  =[];
   let mxDO=[], mnDO=[], mxPH=[], mnPH=[], mxSU=[], mnSU=[], mxSA=[], mnSA=[];
   
   expBuf = [];
@@ -587,12 +593,19 @@ function processTelemetryData(data, dateKey) {
     if(typeof item !== 'object' || item === null) return; 
     
     const ts = item.timestamp || `${dateKey} ${k.replace(/-/g,':')}`;
+    
+    // ✨ Fallback Handling Key (Membaca nama variabel Inggris maupun Indonesia dari ESP32)
+    const valDO = item.DO_mgL ?? item.DO ?? item.do ?? 0;
+    const valPH = item.pH ?? item.ph ?? 0;
+    const valSUHU = item.temperature_C ?? item.Suhu ?? item.suhu ?? item.temperature ?? item.temp ?? 0;
+    const valSAL = item.salinity_ppt ?? item.Salinitas ?? item.salinitas ?? item.salinity ?? item.sal ?? 0;
+
     latest = {
       timestamp: ts,
-      DO_mgL: parseFloat(item.DO_mgL||0).toFixed(2),
-      pH: parseFloat(item.pH||0).toFixed(2),
-      temperature_C: parseFloat(item.temperature_C||0).toFixed(1),
-      salinity_ppt: parseFloat(item.salinity_ppt||0).toFixed(2)
+      DO_mgL: parseFloat(valDO).toFixed(2),
+      pH: parseFloat(valPH).toFixed(2),
+      temperature_C: parseFloat(valSUHU).toFixed(1),
+      salinity_ppt: parseFloat(valSAL).toFixed(2)
     };
     expBuf.push(latest);
     
@@ -638,7 +651,9 @@ function calculateAIInsights(latest) {
   }
 }
 
+// Update fungsi Chart.js secara aman
 function updMain(ch, lbl, d, mx, mn) {
+  if(!ch || !ch.data) return;
   ch.data.labels = lbl;
   ch.data.datasets[0].data = d;
   ch.data.datasets[1].data = mx;
@@ -685,10 +700,15 @@ function startSystem() {
   if (systemStarted) return;
   systemStarted = true;
 
+  const wib = getWibDate();
+  const mm = String(wib.getMonth()+1).padStart(2,'0');
+  const dd = String(wib.getDate()).padStart(2,'0');
+  lastDateString = `${wib.getFullYear()}-${mm}-${dd}`;
+
   initCharts();
   setTimeout(initMap, 500);
   
-  // Mengaktifkan Realtime Streaming Listener bawaan Firebase
+  // Mengaktifkan Realtime Streaming Listener bawaan Firebase SDK
   listenStatus();
   listenTelemetry();
   
