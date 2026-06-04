@@ -5,63 +5,52 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Crustea EBII · Pro Command Center</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
 <style>
 :root {
-  /* Modern Color Palette */
-  --bg:        #f3f4f6;
+  --bg:        #f4f6f5;
   --surface:   #ffffff;
-  --surface-hover: #f9fafb;
-  --border:    #e5e7eb;
-  
-  --primary:   #0f766e; /* Modern Teal */
-  --primary-l: #14b8a6;
-  --primary-dark: #042f2e;
-  
-  --text-main: #111827;
-  --text-muted: #6b7280;
-  
+  --surface-2: #f8faf9;
+  --surface-3: #eef2f0;
+  --border:    #e2e8f0;
+  --primary:   #064e3b;
+  --primary-l: #059669;
+  --text:      #0f172a;
+  --text-2:    #475569;
   --danger:    #ef4444;
   --warning:   #f59e0b;
   --success:   #10b981;
   --info:      #3b82f6;
-  
   --rad:       16px;
-  --rad-sm:    8px;
-  
-  /* Refined, softer shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.02);
+  --rad-sm:    12px;
+  --shadow:    0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   background-color: var(--bg);
-  color: var(--text-main);
-  line-height: 1.5;
+  color: var(--text);
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
-.mono { font-family: 'JetBrains Mono', monospace; }
-
-/* -- SCROLLBAR -- */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+.mono { font-family: 'DM Mono', monospace; }
 
 /* -- LOGIN SCREEN -- */
 #loginScreen {
   position: fixed; inset: 0; z-index: 9999;
-  background: var(--bg);
+  background: radial-gradient(circle at top right, #e6fffa, var(--bg));
   display: flex; align-items: center; justify-content: center;
   padding: 1rem;
 }
@@ -71,36 +60,36 @@ body {
   padding: 3rem 2.5rem;
   border-radius: var(--rad);
   box-shadow: var(--shadow-lg);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(226, 232, 240, 0.8);
   text-align: center;
 }
-.login-box h1 { margin-bottom: 0.5rem; color: var(--primary-dark); font-size: 1.75rem; font-weight: 700; letter-spacing: -0.5px;}
-.login-box p { color: var(--text-muted); margin-bottom: 2.5rem; font-size: 0.95rem;}
+.login-box h1 { margin-bottom: 0.5rem; color: var(--primary); font-size: 1.75rem; font-weight: 700; letter-spacing: -0.5px;}
+.login-box p { color: var(--text-2); margin-bottom: 2.5rem; font-size: 0.95rem;}
 .inp-group { margin-bottom: 1.5rem; text-align: left; }
-.inp-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem;}
+.inp-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-2); margin-bottom: 0.5rem;}
 .inp-group input {
   width: 100%; padding: 0.85rem 1rem;
   border: 1px solid var(--border);
   border-radius: var(--rad-sm);
-  font-family: inherit; font-size: 1rem;
-  transition: all 0.2s;
-  background: var(--surface-hover);
+  font-family: inherit; font-size: 0.95rem;
+  transition: all 0.2s ease;
+  background: var(--surface-2);
 }
-.inp-group input:focus { outline: none; border-color: var(--primary-l); background: var(--surface); box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.1); }
+.inp-group input:focus { outline: none; border-color: var(--primary-l); background: var(--surface); box-shadow: 0 0 0 4px rgba(5,150,105,0.08); }
 .btn-login {
-  width: 100%; padding: 1rem;
+  width: 100%; padding: 0.95rem;
   background: var(--primary); color: white;
   border: none; border-radius: var(--rad-sm);
-  font-weight: 600; font-size: 1rem; cursor: pointer;
+  font-weight: 600; font-size: 0.95rem; cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 10px rgba(6, 78, 59, 0.15);
 }
-.btn-login:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
-#loginError { color: var(--danger); font-size: 0.85rem; margin-top: 1rem; display: none; font-weight: 500;}
+.btn-login:hover { background: var(--primary-l); transform: translateY(-1px); }
+.btn-login:active { transform: translateY(0); }
+#loginError { color: var(--danger); font-size: 0.85rem; margin-top: 1.25rem; display: none; padding: 0.75rem; background: #fef2f2; border-radius: 8px; border: 1px solid #fee2e2; }
 
 /* -- LAYOUT MAIN -- */
 #appMain { display: flex; min-height: 100vh; }
-
 .sidebar {
   width: 280px; background: var(--surface);
   border-right: 1px solid var(--border);
@@ -108,137 +97,135 @@ body {
   position: sticky; top: 0; height: 100vh;
   z-index: 50;
 }
-.sb-head { padding: 2rem 1.5rem; }
-.sb-head h1 { font-size: 1.5rem; font-weight: 800; color: var(--primary-dark); letter-spacing: -0.5px;}
-.sb-nav { padding: 0 1rem; flex: 1; overflow-y: auto;}
+.sb-head { padding: 2rem 1.5rem; border-bottom: 1px solid var(--border); }
+.sb-head h1 { font-size: 1.4rem; font-weight: 700; color: var(--primary); letter-spacing: -0.5px;}
+.sb-nav { padding: 1.5rem 1rem; flex: 1; overflow-y: auto;}
 .nav-item {
   display: flex; align-items: center; gap: 0.75rem;
   padding: 0.85rem 1rem;
-  color: var(--text-muted); font-weight: 500; font-size: 0.95rem;
+  color: var(--text-2); font-weight: 500; font-size: 0.95rem;
   border-radius: var(--rad-sm); text-decoration: none;
-  margin-bottom: 0.25rem; transition: all 0.2s;
+  margin-bottom: 0.5rem; transition: all 0.2s ease;
 }
-.nav-item:hover { background: var(--surface-hover); color: var(--primary); }
-.nav-item.active { background: #f0fdfa; color: var(--primary); font-weight: 600; }
-.sb-foot { padding: 1.5rem; font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid var(--border); }
-
-.content { flex: 1; padding: 2.5rem; max-width: 1600px; margin: 0 auto; overflow-x: hidden; }
+.nav-item:hover { background: var(--surface-2); color: var(--primary-l); }
+.nav-item.active { background: #e6fffa; color: var(--primary); font-weight: 600; }
+.sb-foot { padding: 1.5rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--text-2); background: var(--surface-2); }
+.content { flex: 1; padding: 2.5rem; max-width: 1400px; margin: 0 auto; width: 100%; }
 
 /* -- HEADER TOP -- */
-.top-bar {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  margin-bottom: 2.5rem;
-}
-.top-title h2 { font-size: 1.85rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px;}
-.top-title p { color: var(--text-muted); margin-top: 0.25rem; font-size: 0.95rem;}
+.top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; gap: 1rem; }
+.top-title h2 { font-size: 1.85rem; font-weight: 700; color: var(--text); letter-spacing: -0.75px;}
+.top-title p { color: var(--text-2); margin-top: 0.25rem; font-size: 0.95rem;}
 .top-actions { display: flex; gap: 1rem; align-items: center; }
 
 .status-badge {
-  display: inline-flex; align-items: center; gap: 0.5rem;
-  padding: 0.6rem 1.25rem; border-radius: 99px;
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.6rem 1.2rem; border-radius: 99px;
   background: var(--surface); border: 1px solid var(--border);
-  font-weight: 600; font-size: 0.85rem; box-shadow: var(--shadow-sm);
-  color: var(--text-main);
+  font-weight: 600; font-size: 0.85rem; box-shadow: var(--shadow);
 }
-.dot { width: 8px; height: 8px; border-radius: 50%; }
-.dot.on { background: var(--success); box-shadow: 0 0 8px var(--success); animation: pulse 2s infinite;}
-.dot.off { background: var(--danger); }
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot.on { background: var(--success); box-shadow: 0 0 10px var(--success); animation: pulse 2s infinite;}
+.dot.off { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
 
-.btn {
-  padding: 0.6rem 1.25rem; border-radius: 99px;
-  font-weight: 600; font-size: 0.85rem; cursor: pointer;
-  border: 1px solid var(--border); background: var(--surface); color: var(--text-main);
-  transition: all 0.2s; box-shadow: var(--shadow-sm); display: inline-flex; align-items: center; gap: 0.5rem;
+/* -- 1. WIDGET ANALISIS PAKAR INSTAN -- */
+.ai-box {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: white; border-radius: var(--rad); padding: 1.75rem;
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 1.75rem;
+  border-left: 5px solid #38bdf8;
 }
-.btn:hover { background: var(--surface-hover); }
-
-/* -- PREMIUM AI INSIGHT BOX (Based on latest screenshot) -- */
-.ai-box-container {
-  background: #0f172a; /* Dark slate */
-  border-radius: var(--rad);
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-  box-shadow: var(--shadow-md);
-  color: #f8fafc;
-}
-.ai-box-header {
-  display: flex; align-items: center; gap: 0.75rem;
-  font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;
-  color: #38bdf8; /* Light blue accent */
-}
-.ai-box-content {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: var(--rad-sm);
+.ai-box h3 { font-size: 1.2rem; font-weight: 600; display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.25rem; color: #bae6fd;}
+.ai-insight-content {
+  background: rgba(255, 255, 255, 0.04);
   padding: 1.25rem;
-  display: flex; align-items: flex-start; gap: 1rem;
+  border-radius: var(--rad-sm);
+  font-size: 0.95rem; line-height: 1.7;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
-.ai-icon-wrap {
-  background: var(--success);
-  color: white;
-  border-radius: 4px;
-  padding: 4px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.ai-text h4 { font-size: 0.95rem; font-weight: 600; color: #10b981; margin-bottom: 0.25rem; }
-.ai-text p { font-size: 0.9rem; color: #cbd5e1; line-height: 1.6; }
+.ai-list { margin-top: 0.75rem; margin-left: 1.25rem; }
+.ai-list li { margin-bottom: 0.5rem; color: #cbd5e1; }
 
-.status-bar {
-  background: var(--success);
-  color: white;
-  border-radius: var(--rad);
-  padding: 1rem 1.5rem;
-  margin-bottom: 2.5rem;
-  display: flex; flex-direction: column; justify-content: center;
-  box-shadow: var(--shadow-md);
+/* -- 2. WIDGET ALARM REALTIME -- */
+.alarm-widget {
+  border-radius: var(--rad); padding: 1.75rem; margin-bottom: 2.5rem;
+  box-shadow: var(--shadow-lg); transition: all 0.4s ease; color: white;
 }
-.status-bar h3 { font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;}
-.status-bar p { font-size: 0.9rem; opacity: 0.9; }
+.alarm-widget.safe {
+  background: linear-gradient(135deg, #064e3b 0%, #047857 100%);
+}
+.alarm-widget.danger {
+  background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%);
+  animation: pulse-danger 2s infinite;
+}
+.alarm-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+.alarm-header h3 { font-size: 1.3rem; font-weight: 700; margin: 0; letter-spacing: -0.5px;}
+.alarm-content p { font-size: 0.95rem; opacity: 0.95; line-height: 1.6; }
+.alarm-content ul { margin-left: 1.5rem; margin-top: 0.75rem; line-height: 1.7;}
+.alarm-content li { margin-bottom: 0.5rem; font-size: 0.95rem; }
 
-/* -- GRID CARDS -- */
-.grid-overview {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5rem; margin-bottom: 2.5rem;
+/* -- 3. WIDGET LOG TERMINAL -- */
+.log-container {
+  max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; padding-right: 6px;
 }
-.card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--rad); padding: 1.5rem;
-  box-shadow: var(--shadow-sm); transition: box-shadow 0.2s;
+.log-item {
+  display: flex; align-items: flex-start; gap: 0.85rem;
+  padding: 1rem 1.25rem; border-radius: var(--rad-sm);
+  background: var(--surface-2); border-left: 4px solid var(--border);
+  font-size: 0.9rem; transition: background 0.2s;
+  border: 1px solid rgba(226, 232, 240, 0.5);
+  border-left-width: 4px;
 }
-.card:hover { box-shadow: var(--shadow-md); }
-.card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;}
-.card-head h3 { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
-.val-wrap { display: flex; align-items: baseline; gap: 0.35rem;}
-.val { font-size: 2.5rem; font-weight: 700; color: var(--primary-dark); letter-spacing: -1px;}
-.unit { font-size: 1rem; color: var(--text-muted); font-weight: 500;}
+.log-item.danger-log { border-left-color: var(--danger); background: #fdf2f2; border-top-color: #fee2e2; border-right-color: #fee2e2; border-bottom-color: #fee2e2; }
+.log-item .log-time {
+  font-family: 'DM Mono', monospace; font-weight: 600; color: var(--text-2);
+  background: var(--surface-3); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.8rem; white-space: nowrap;
+}
+.log-item .log-msg { flex: 1; color: var(--text); line-height: 1.5; }
+.log-item .log-saran { margin-top: 0.5rem; font-size: 0.85rem; color: #b91c1c; font-weight: 600; background: rgba(239, 68, 68, 0.05); padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.1); display: inline-block; }
 
-/* -- CHART GRID -- */
-.grid-charts {
-  display: grid; grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem; margin-bottom: 2.5rem;
-}
-.chart-card { padding: 0; overflow: hidden; display: flex; flex-direction: column;}
-.chart-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); background: var(--surface); }
-.chart-header h3 { font-weight: 600; color: var(--text-main); font-size: 1rem;}
-.chart-header p { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;}
-.chart-container { position: relative; height: 300px; width: 100%; padding: 1rem; background: var(--surface); flex: 1;}
+.log-container::-webkit-scrollbar { width: 6px; }
+.log-container::-webkit-scrollbar-track { background: var(--surface-2); border-radius: 10px; }
+.log-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+.log-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-.map-container { height: 350px; border-radius: var(--rad-sm); overflow: hidden; z-index: 10; border: 1px solid var(--border); }
+@keyframes pulse-danger {
+  0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.5); }
+  70% { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
 
 @keyframes pulse {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  0% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
-@media (max-width: 1024px) { .grid-charts { grid-template-columns: 1fr; } }
-@media (max-width: 768px) {
+/* -- GRID CARDS -- */
+.grid-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--rad); padding: 1.75rem; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+.card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;}
+.card-head h3 { font-size: 0.85rem; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.75px;}
+.val-wrap { display: flex; align-items: baseline; gap: 0.4rem;}
+.val { font-size: 2.5rem; font-weight: 700; color: var(--text); letter-spacing: -1px; line-height: 1;}
+.unit { font-size: 1rem; color: var(--text-2); font-weight: 600;}
+
+/* -- CHART GRID -- */
+.grid-charts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.75rem; margin-bottom: 2.5rem; }
+.chart-container { position: relative; height: 280px; width: 100%; padding: 0 1.5rem 1.5rem 1.5rem; }
+.map-container { height: 380px; border-radius: var(--rad-sm); overflow: hidden; z-index: 10; border: 1px solid var(--border); }
+
+@media (max-width: 1200px) { .grid-charts { grid-template-columns: 1fr; } }
+@media (max-width: 992px) {
   #appMain { flex-direction: column; }
-  .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 1rem;}
-  .sb-nav { display: none; } 
-  .top-bar { flex-direction: column; gap: 1rem; }
+  .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border);}
+  .sb-nav { display: flex; flex-wrap: wrap; padding: 1rem; gap: 0.5rem; overflow-y: visible;}
+  .nav-item { margin-bottom: 0; }
+  .sb-head { padding: 1.5rem; text-align: center; }
+  .sb-foot { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
   .content { padding: 1.5rem; }
+  .top-bar { flex-direction: column; align-items: flex-start; }
 }
 </style>
 </head>
@@ -250,7 +237,7 @@ body {
     <p>Pro Command Center Authentication</p>
     <div class="inp-group">
       <label>Email Pengguna</label>
-      <input type="email" id="inEmail" placeholder="admin@crustea.id">
+      <input type="email" id="inEmail" placeholder="Masukkan email Anda">
     </div>
     <div class="inp-group">
       <label>Kata Sandi</label>
@@ -268,28 +255,27 @@ body {
     </div>
     <nav class="sb-nav">
       <a href="#" class="nav-item active">
-        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
         Dashboard
       </a>
       <a href="#" class="nav-item" onclick="toggleRelay()">
-        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
         <span id="relayText">Sistem Halted (OFF)</span>
       </a>
       <a href="#" class="nav-item" onclick="downloadCSV()">
-        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
         Ekspor Data (CSV)
       </a>
       
-      <a href="#" class="nav-item" onclick="doLogout()" style="margin-top: 2rem; color: var(--danger);">
-        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+      <a href="#" class="nav-item" onclick="doLogout()" style="margin-top: 20px; color: var(--danger);">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
         Keluar (Logout)
       </a>
     </nav>
     <div class="sb-foot">
-      <div style="font-weight: 600; color: var(--primary-dark); margin-bottom: 4px;">Live Stream: <span id="streamStatus" style="color: var(--success)">Aktif</span></div>
-      <div id="liveClock" class="mono" style="margin-bottom: 4px;">--:--:-- WIB</div>
-      <div id="syncTimer" class="mono" style="color:var(--text-muted); font-size: 0.75rem;">Next Sync: --:--</div>
-      <div style="margin-top: 12px; font-size: 0.75rem;">v3.2.0-pro (Realtime)</div>
+      <div id="syncTimer" class="mono" style="margin-bottom:4px; font-weight:700; color:var(--primary-l)">Live Stream: Aktif</div>
+      <div id="liveClock" class="mono" style="font-weight: 500;">--:--:-- WIB</div>
+      <div style="margin-top: 8px; opacity: 0.7; font-size: 0.75rem;">v3.2.0-pro (Realtime & Log Panel)</div>
     </div>
   </aside>
 
@@ -297,7 +283,7 @@ body {
     <div class="top-bar">
       <div class="top-title">
         <h2>Pemantauan Kualitas Air</h2>
-        <p>Lokasi Tambak: <strong id="locName" style="color: var(--text-main);">Lembah Serayu, Banjarnegara</strong></p>
+        <p>Lokasi Tambak: <span id="locName" style="font-weight: 600; color: var(--primary);">Mengambil satelit...</span></p>
       </div>
       <div class="top-actions">
         <div class="status-badge">
@@ -307,65 +293,63 @@ body {
       </div>
     </div>
 
-    <div class="ai-box-container">
-      <div class="ai-box-header">
-        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+    <div class="ai-box">
+      <h3>
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
         Analisis Pakar Instan (Kesimpulan Ekosistem)
-      </div>
-      <div class="ai-box-content" id="aiInsightBox">
-        <div class="ai-icon-wrap">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-        </div>
-        <div class="ai-text" id="aiInsight">
-          <h4>Menunggu Data...</h4>
-          <p>Sistem sedang menganalisis data ekosistem yang masuk.</p>
-        </div>
+      </h3>
+      <div id="aiInsight" class="ai-insight-content">
+        Menganalisa pola kualitas air...
       </div>
     </div>
 
-    <div class="status-bar" id="statusBar">
-      <h3>
-        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        Status Detik Ini: AMAN (NORMAL)
-      </h3>
-      <p>Sensor yang berjalan secara live mendeteksi air tambak dalam kondisi prima.</p>
+    <div id="alarmWidget" class="alarm-widget safe">
+      <div class="alarm-header">
+        <svg id="alarmIcon" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <h3 id="alarmTitle">Status Detik Ini: Menunggu Data...</h3>
+      </div>
+      <div id="alarmContent" class="alarm-content">
+        <p>Memuat parameter telemetri terakhir dari sensor lapangan.</p>
+      </div>
     </div>
 
     <div class="grid-overview">
-      <div class="card">
+      <div class="card" style="border-top: 4px solid var(--info);">
         <div class="card-head">
           <h3>Oksigen (DO)</h3>
-          <span style="color:var(--info)"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg></span>
+          <span style="color:var(--info)"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg></span>
         </div>
         <div class="val-wrap">
           <div class="val" id="rtDO">--</div>
           <div class="unit">mg/L</div>
         </div>
       </div>
-      <div class="card">
+      <div class="card" style="border-top: 4px solid var(--warning);">
         <div class="card-head">
           <h3>Tingkat pH</h3>
-          <span style="color:var(--warning)"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg></span>
+          <span style="color:var(--warning)"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg></span>
         </div>
         <div class="val-wrap">
           <div class="val" id="rtPH">--</div>
           <div class="unit">pH</div>
         </div>
       </div>
-      <div class="card">
+      <div class="card" style="border-top: 4px solid var(--danger);">
         <div class="card-head">
           <h3>Suhu Air</h3>
-          <span style="color:var(--danger)"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg></span>
+          <span style="color:var(--danger)"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg></span>
         </div>
         <div class="val-wrap">
           <div class="val" id="rtSU">--</div>
           <div class="unit">°C</div>
         </div>
       </div>
-      <div class="card">
+      <div class="card" style="border-top: 4px solid var(--primary-l);">
         <div class="card-head">
           <h3>Salinitas</h3>
-          <span style="color:var(--primary)"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg></span>
+          <span style="color:var(--primary-l)"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg></span>
         </div>
         <div class="val-wrap">
           <div class="val" id="rtSA">--</div>
@@ -374,49 +358,62 @@ body {
       </div>
     </div>
 
+    <div class="card" style="margin-bottom: 2.5rem;">
+      <div class="card-head">
+        <h3 style="color: var(--text); font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+          Log Terminal: Riwayat Anomali Sensor
+        </h3>
+        <span id="logCounter" class="mono" style="font-size: 0.8rem; background: var(--surface-3); padding: 0.35rem 0.75rem; border-radius: 20px; font-weight: 600; color: var(--text-2);">0 Masalah Terdeteksi</span>
+      </div>
+      <div id="alarmLogTerminal" class="log-container">
+        <p style="color: var(--text-2); font-size: 0.9rem; font-style: italic; padding: 0.5rem 0;">Belum ada riwayat anomali pada siklus sinkronisasi ini.</p>
+      </div>
+    </div>
+
     <div class="grid-charts">
-      <div class="card chart-card">
-        <div class="chart-header">
-          <h3>Oksigen Terlarut (DO)</h3>
-          <p>Target: > 4.5 mg/L | Ideal: 5 - 7 mg/L</p>
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div style="padding:1.5rem; border-bottom:1px solid var(--border); background: var(--surface-2);">
+          <h3 style="font-weight:700; font-size:1rem; color:var(--text);">Oksigen Terlarut (DO)</h3>
+          <p style="font-size:0.85rem; color:var(--text-2); margin-top:2px;">Target: &gt; 4.5 mg/L | Ideal: 5 - 7 mg/L</p>
         </div>
         <div class="chart-container"><canvas id="chartDO"></canvas></div>
       </div>
-      <div class="card chart-card">
-        <div class="chart-header">
-          <h3>Tingkat Keasaman (pH)</h3>
-          <p>Target: 7.5 - 8.5</p>
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div style="padding:1.5rem; border-bottom:1px solid var(--border); background: var(--surface-2);">
+          <h3 style="font-weight:700; font-size:1rem; color:var(--text);">Tingkat Keasaman (pH)</h3>
+          <p style="font-size:0.85rem; color:var(--text-2); margin-top:2px;">Target: 7.5 - 8.5</p>
         </div>
         <div class="chart-container"><canvas id="chartPH"></canvas></div>
       </div>
-      <div class="card chart-card">
-        <div class="chart-header">
-          <h3>Suhu Air (Temp)</h3>
-          <p>Target: 25 - 31 °C</p>
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div style="padding:1.5rem; border-bottom:1px solid var(--border); background: var(--surface-2);">
+          <h3 style="font-weight:700; font-size:1rem; color:var(--text);">Suhu Air (Temp)</h3>
+          <p style="font-size:0.85rem; color:var(--text-2); margin-top:2px;">Target: 25 - 31 °C</p>
         </div>
         <div class="chart-container"><canvas id="chartSuhu"></canvas></div>
       </div>
-      <div class="card chart-card">
-        <div class="chart-header">
-          <h3>Salinitas</h3>
-          <p>Target: 0 - 1.0 ppt (Air Tawar/Payau)</p>
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div style="padding:1.5rem; border-bottom:1px solid var(--border); background: var(--surface-2);">
+          <h3 style="font-weight:700; font-size:1rem; color:var(--text);">Salinitas</h3>
+          <p style="font-size:0.85rem; color:var(--text-2); margin-top:2px;">Target: 0 - 1.0 ppt (Air Tawar/Payau)</p>
         </div>
         <div class="chart-container"><canvas id="chartSal"></canvas></div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-head">
-        <h3 style="font-size: 1rem; color: var(--text-main);">Lokasi & Cuaca Terkini</h3>
+      <div class="card-head" style="margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.1rem; font-weight: 700;">Lokasi & Cuaca Terkini</h3>
       </div>
-      <div style="display:flex; gap:2.5rem; flex-wrap:wrap; margin-bottom:1.5rem;">
+      <div style="display:flex; gap:3rem; flex-wrap:wrap; margin-bottom:1.75rem; background: var(--surface-2); padding: 1.25rem; border-radius: var(--rad-sm); border: 1px solid var(--border);">
         <div>
-          <div style="font-size:0.85rem; color:var(--text-muted); font-weight: 500; margin-bottom: 4px;">Kondisi Cuaca WIB</div>
-          <div style="font-size:1.5rem; font-weight:700; color:var(--text-main); letter-spacing: -0.5px;" id="wDate">--</div>
+          <div style="font-size:0.85rem; font-weight:600; color:var(--text-2); text-transform:uppercase; letter-spacing:0.5px;">Kondisi Cuaca WIB</div>
+          <div style="font-size:1.35rem; font-weight:700; color:var(--text); margin-top:4px;" id="wDate">--</div>
         </div>
         <div>
-          <div style="font-size:0.85rem; color:var(--text-muted); font-weight: 500; margin-bottom: 4px;">Suhu Ambien Darat</div>
-          <div style="font-size:1.5rem; font-weight:700; color:var(--text-main); letter-spacing: -0.5px;" id="ambTemp">--</div>
+          <div style="font-size:0.85rem; font-weight:600; color:var(--text-2); text-transform:uppercase; letter-spacing:0.5px;">Suhu Ambien Darat</div>
+          <div style="font-size:1.35rem; font-weight:700; color:var(--primary-l); margin-top:4px;" id="ambTemp">--</div>
         </div>
       </div>
       <div id="map" class="map-container"></div>
@@ -425,20 +422,31 @@ body {
 </div>
 
 <script>
-// ── KONFIGURASI FIREBASE ──
-const API_KEY = "AIzaSyDoBiXA94eozZtZr5p6_FYnCBujj1fl8fs"; 
-const FB = "https://forecast-banjarnegara-default-rtdb.asia-southeast1.firebasedatabase.app/";
+// ── KONFIGURASI FIREBASE SDK ──
+const firebaseConfig = {
+  apiKey: "AIzaSyDoBiXA94eozZtZr5p6_FYnCBujj1fl8fs", 
+  databaseURL: "https://forecast-banjarnegara-default-rtdb.asia-southeast1.firebasedatabase.app/"
+};
 
-let authToken = localStorage.getItem('crustea_auth_token') || null;
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const auth = firebase.auth();
+
 let expBuf = [];
-let syncCountdown = 120; 
 let currentRelayStatus = "OFF";
+let currentTelemetryRef = null;
+let lastDateString = "";
+let systemStarted = false;
 
-window.addEventListener('load', () => {
-  if (authToken) {
+// ── PERSISTENT SESSION HANDLER ──
+auth.onAuthStateChanged((user) => {
+  if (user) {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('appMain').style.display = 'flex';
     startSystem();
+  } else {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('appMain').style.display = 'none';
   }
 });
 
@@ -448,196 +456,310 @@ function getWibDate() {
   return new Date(utc + (3600000 * 7));
 }
 
+// ── FUNGSI LOGIN ──
 async function doLogin() {
   let emRaw = document.getElementById('inEmail').value;
   let pwRaw = document.getElementById('inPass').value;
-  
   const em = emRaw.replace(/[^\x20-\x7E]/g, '').trim();
   const pw = pwRaw.replace(/[^\x20-\x7E]/g, '').trim();
 
   const err = document.getElementById('loginError');
   err.style.display = 'none';
 
-  if (!em || !pw) {
-    err.textContent = "Email dan sandi wajib diisi.";
-    err.style.display = 'block';
-    return;
-  }
+  if (!em || !pw) { err.textContent = "Email dan sandi wajib diisi."; err.style.display = 'block'; return; }
+  if (!em.includes('@') || !em.includes('.')) { err.textContent = "Format alamat email salah."; err.style.display = 'block'; return; }
 
-  err.style.display = 'block';
-  err.style.color = 'var(--info)';
-  err.textContent = "Memverifikasi ke server...";
+  err.style.display = 'block'; err.style.color = '#3b82f6'; err.textContent = "Memverifikasi ke server...";
 
-  const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`;
   try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: em, password: pw, returnSecureToken: true })
-    });
-    const data = await res.json();
-
-    if (data.error) {
-      err.style.color = 'var(--danger)';
-      let msg = data.error.message;
-      if (msg === "EMAIL_NOT_FOUND") msg = "Email ini belum didaftarkan di Firebase.";
-      else if (msg === "INVALID_PASSWORD") msg = "Kata sandi salah.";
-      else if (msg === "INVALID_EMAIL") msg = "Format email ditolak.";
-      err.textContent = `Gagal: ${msg}`;
-    } else {
-      authToken = data.idToken;
-      localStorage.setItem('crustea_auth_token', authToken);
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('appMain').style.display = 'flex';
-      startSystem();
-    }
-  } catch(e) {
+    await auth.signInWithEmailAndPassword(em, pw);
+  } catch(error) {
     err.style.color = 'var(--danger)';
-    err.textContent = "Gagal terhubung ke server autentikasi.";
+    let msg = error.message;
+    if (error.code === "auth/user-not-found" || error.code === "auth/invalid-credential") msg = "Email belum terdaftar atau sandi salah.";
+    else if (error.code === "auth/wrong-password") msg = "Kata sandi salah.";
+    err.textContent = `Gagal: ${msg}`;
   }
 }
 
 function doLogout() {
-  localStorage.removeItem('crustea_auth_token');
-  location.reload();
+  auth.signOut().then(() => { location.reload(); });
 }
 
+// ── INIT PETA LEAFLET ──
 let map;
 function initMap() {
   if (map) return;
   const pondLocation = [-7.3970, 109.6972]; 
   map = L.map('map').setView(pondLocation, 15);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    maxZoom: 19, attribution: '© OpenStreetMap'
-  }).addTo(map);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
   L.marker(pondLocation).addTo(map).bindPopup("<b>EBII Node 01</b><br>Banjarnegara").openPopup();
+  document.getElementById('locName').textContent = "Lembah Serayu, Banjarnegara";
 }
 
+// ── INIT CHART.JS ──
 function makeChart(ctxId, color, label, min, max) {
   return new Chart(document.getElementById(ctxId).getContext('2d'), {
     type: 'line',
     data: {
       labels: [],
       datasets: [
-        {
-          label: label,
-          data: [],
-          borderColor: color,
-          backgroundColor: color + '15',
-          borderWidth: 2,
-          pointRadius: 2,
-          pointBackgroundColor: color,
-          fill: true,
-          tension: 0.4 // Smoother curves
-        },
-        { label: 'Batas Atas', data: [], borderColor: '#ef4444', borderDash: [4,4], borderWidth: 1, pointRadius: 0, fill: false },
-        { label: 'Batas Bawah', data: [], borderColor: '#f59e0b', borderDash: [4,4], borderWidth: 1, pointRadius: 0, fill: false }
+        { label: label, data: [], borderColor: color, backgroundColor: color + '0a', borderWidth: 2.5, pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: '#fff', fill: true, tension: 0.25 },
+        { label: 'Batas Atas', data: [], borderColor: '#ef4444', borderDash: [6,4], borderWidth: 1.2, pointRadius: 0, fill: false },
+        { label: 'Batas Bawah', data: [], borderColor: '#f59e0b', borderDash: [6,4], borderWidth: 1.2, pointRadius: 0, fill: false }
       ]
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: { legend: { display: false }, tooltip: { padding: 12, cornerRadius: 8, backgroundColor: 'rgba(15, 23, 42, 0.9)' } },
-      scales: {
-        x: { grid: { display: false }, ticks: { font: { family: 'JetBrains Mono' } } },
-        y: { min: min, max: max, grid: { borderDash: [4,4], color: '#f1f5f9' }, ticks: { font: { family: 'JetBrains Mono' } } }
-      }
+    options: { 
+      responsive: true, 
+      maintainAspectRatio: false, 
+      animation: false, 
+      interaction: { mode: 'index', intersect: false }, 
+      plugins: { legend: { display: false } }, 
+      scales: { 
+        x: { grid: { color: '#f1f5f9' }, ticks: { font: { family: 'DM Sans', size: 11 }, color: '#64748b' } }, 
+        y: { min: min, max: max, grid: { color: '#f1f5f9' }, ticks: { font: { family: 'DM Mono', size: 11 }, color: '#64748b' } } 
+      } 
     }
   });
 }
 
 let mains = {};
 function initCharts() {
-  mains.DO = makeChart('chartDO', '#14b8a6', 'DO', 0, 10);
+  mains.DO = makeChart('chartDO', '#059669', 'DO', 0, 10);
   mains.pH = makeChart('chartPH', '#f59e0b', 'pH', 5, 10);
   mains.Suhu = makeChart('chartSuhu', '#ef4444', 'Suhu', 20, 40);
   mains.Sal = makeChart('chartSal', '#3b82f6', 'Salinitas', 0, 5);
 }
 
-async function fetchStatus() {
-  try {
-    const cb = new Date().getTime();
-    const r = await fetch(`${FB}forecast/status.json?auth=${authToken}&_nocache=${cb}`);
-    if (!r.ok && r.status === 401) { doLogout(); return; }
-    if (!r.ok) return;
-
-    const v = await r.json(); 
-    const dt = document.getElementById('hwDot');
-    const st = document.getElementById('hwStatus');
-    const relayText = document.getElementById('relayText');
-    
+// ── REAL-TIME LISTENER STATUS & RELAY ──
+function listenStatus() {
+  db.ref('forecast/status').on('value', (snapshot) => {
+    const v = snapshot.val();
+    const dt = document.getElementById('hwDot'); const st = document.getElementById('hwStatus'); const relayText = document.getElementById('relayText');
     currentRelayStatus = v || "OFF";
-    
     if (currentRelayStatus === "ON") {
-      dt.className = 'dot on'; 
-      st.textContent = 'Sistem Aktif (ESP32 Live)';
-      relayText.textContent = 'Matikan Sistem (ON)';
-      relayText.style.color = 'var(--success)';
+      dt.className = 'dot on'; st.textContent = 'Sistem Aktif (ESP32 Live)';
+      relayText.textContent = 'Matikan Sistem (ON)'; relayText.style.color = 'var(--success)';
     } else {
-      dt.className = 'dot off'; 
-      st.textContent = 'Sistem Halted';
-      relayText.textContent = 'Hidupkan Sistem (OFF)';
-      relayText.style.color = 'var(--text-muted)';
+      dt.className = 'dot off'; st.textContent = 'Sistem Halted';
+      relayText.textContent = 'Hidupkan Sistem (OFF)'; relayText.style.color = 'var(--text-2)';
     }
-  } catch(e) {}
+  });
 }
-
-async function toggleRelay() {
+function toggleRelay() {
   const next = currentRelayStatus === "ON" ? "OFF" : "ON";
-  try {
-    await fetch(`${FB}forecast/status.json?auth=${authToken}`, { 
-      method:'PUT', 
-      headers: {"Content-Type": "application/json"}, 
-      body: JSON.stringify(next) 
-    });
-    fetchStatus(); 
-  } catch(e) {}
+  db.ref('forecast/status').set(next);
 }
 
-function processPayload(latest) {
-  document.getElementById('rtDO').textContent = latest.DO_mgL;
-  document.getElementById('rtPH').textContent = latest.pH;
-  document.getElementById('rtSU').textContent = latest.temperature_C;
-  document.getElementById('rtSA').textContent = latest.salinity_ppt;
-}
-
+// ── WIDGET 1: ANALISIS PAKAR INSTAN (KESIMPULAN) ──
 function calculateAIInsights(latest) {
-  let issues = [];
-  const d = parseFloat(latest.DO_mgL);
-  const p = parseFloat(latest.pH);
-  const t = parseFloat(latest.temperature_C);
-
-  if (d < 4.5) issues.push("Oksigen Terlarut sangat rendah, risiko hipoksia!");
-  if (p < 7.5) issues.push("Air terlalu asam. Pertimbangkan kapur dolomit.");
-  if (p > 8.5) issues.push("Air terlalu basa (alkalis).");
-  if (t > 32) issues.push("Suhu air tinggi. Kurangi pakan.");
-
+  const d = parseFloat(latest.DO_mgL); const p = parseFloat(latest.pH); const t = parseFloat(latest.temperature_C);
   const aiEl = document.getElementById('aiInsight');
-  const aiWrap = document.getElementById('aiInsightBox');
-  const iconWrap = document.querySelector('.ai-icon-wrap');
-  const statusBar = document.getElementById('statusBar');
+  
+  let insightHtml = "Berbagai parameter masih dievaluasi.";
 
-  if (issues.length === 0) {
-    iconWrap.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>';
-    iconWrap.style.background = 'var(--success)';
-    aiEl.innerHTML = `<h4>Ekosistem Tambak Sangat Sehat.</h4><p>Kadar Oksigen, Keasaman Air (pH), dan Suhu Lingkungan semuanya berjalan harmonis di dalam batas rasio budidaya ideal. Pertahankan jadwal tebar pakan seperti biasa.</p>`;
-    
-    statusBar.style.background = 'var(--success)';
-    statusBar.innerHTML = `<h3><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Status Detik Ini: AMAN (NORMAL)</h3><p>Sensor yang berjalan secara live mendeteksi air tambak dalam kondisi prima.</p>`;
+  if (d >= 4.5 && p >= 7.5 && p <= 8.5 && t >= 25 && t <= 31) {
+    insightHtml = `
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span style="font-size:26px;">✅</span>
+        <div>
+          <b style="color:#a7f3d0; font-size:1.05rem;">Ekosistem Tambak Sangat Sehat.</b><br>
+          <span style="color:#e2e8f0; font-size:0.95rem;">Kadar Oksigen, Keasaman Air (pH), dan Suhu Lingkungan semuanya berjalan harmonis di dalam batas rasio budidaya ideal. Pertahankan jadwal tebar pakan seperti biasa.</span>
+        </div>
+      </div>`;
   } else {
-    iconWrap.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>';
-    iconWrap.style.background = 'var(--danger)';
-    aiEl.querySelector('h4').style.color = 'var(--danger)';
-    aiEl.innerHTML = `<h4 style="color: #ef4444;">Peringatan Sistem!</h4><ul style="margin-left: 1rem; color: #cbd5e1; font-size: 0.9rem;">` + issues.map(i => `<li style="margin-bottom:4px;">${i}</li>`).join('') + `</ul>`;
-    
-    statusBar.style.background = 'var(--danger)';
-    statusBar.innerHTML = `<h3><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Status Detik Ini: ANOMALI TERDETEKSI</h3><p>Segera lakukan tindakan pencegahan berdasarkan analisis pakar di atas.</p>`;
+    let specificIssues = [];
+    if (d < 4.5) specificIssues.push("Volume Oksigen kritis memicu lemas/kematian masal.");
+    if (p < 7.5 || p > 8.5) specificIssues.push("Fluktuasi pH mempengaruhi nafsu makan dan metabolisme udang/ikan.");
+    if (t < 25 || t > 31) specificIssues.push("Suhu di luar ambang batas memicu stres lingkungan dan risiko kemunculan penyakit bakterial.");
+
+    insightHtml = `
+      <div style="display:flex; align-items:flex-start; gap:12px;">
+        <span style="font-size:26px; margin-top:2px;">⚠️</span>
+        <div>
+          <b style="color:#fca5a5; font-size:1.05rem;">Ekosistem Terindikasi Anomali / Stres Lingkungan!</b><br>
+          <span style="color:#e2e8f0; font-size:0.95rem;">Sistem Pakar menyoroti hal berikut ini sebagai ancaman nyata:</span>
+          <ul class="ai-list">
+            ${specificIssues.map(issue => `<li>${issue}</li>`).join('')}
+          </ul>
+          <i style="color:#94a3b8; font-size:0.85rem; display:block; margin-top:0.5rem;">Silakan periksa panel Log Terminal di bawah untuk mengetahui rekomendasi penanganan teknis lapangan.</i>
+        </div>
+      </div>`;
+  }
+  aiEl.innerHTML = insightHtml;
+}
+
+// ── WIDGET 2: STATUS REALTIME SAAT INI ──
+function checkAlarmsRealtime(latest) {
+  const d = parseFloat(latest.DO_mgL); const p = parseFloat(latest.pH); const t = parseFloat(latest.temperature_C); const s = parseFloat(latest.salinity_ppt);
+  let alarms = [];
+
+  if (d < 4.5) alarms.push(`<b>Oksigen Drop (${d} mg/L):</b> Hidupkan aerator/kincir ke kecepatan penuh!`);
+  else if (d > 8.0) alarms.push(`<b>Oksigen Tinggi (${d} mg/L):</b> Supersaturasi, kurangi penggunaan kincir siang hari.`);
+
+  if (p < 7.5) alarms.push(`<b>pH Asam (${p}):</b> Tebarkan dolomit/kalsit secara bertahap.`);
+  else if (p > 8.5) alarms.push(`<b>pH Basa (${p}):</b> Berikan molase/probiotik atau flushing air.`);
+
+  if (t < 25.0) alarms.push(`<b>Suhu Rendah (${t} °C):</b> Kurangi pakan harian agar tidak mengendap.`);
+  else if (t > 31.0) alarms.push(`<b>Suhu Tinggi (${t} °C):</b> Naikkan kedalaman atau pasok air baru.`);
+
+  if (s > 1.0) alarms.push(`<b>Salinitas (${s} ppt):</b> Tambahkan suplai air tawar.`);
+
+  const widget = document.getElementById('alarmWidget');
+  const title = document.getElementById('alarmTitle');
+  const content = document.getElementById('alarmContent');
+  const icon = document.getElementById('alarmIcon');
+
+  if (alarms.length === 0) {
+    widget.className = 'alarm-widget safe'; title.textContent = 'Status Detik Ini: AMAN (NORMAL)';
+    content.innerHTML = '<p>Sensor yang berjalan secara live mendeteksi air tambak dalam kondisi prima.</p>';
+    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+  } else {
+    widget.className = 'alarm-widget danger'; title.textContent = 'PERINGATAN: Alarm Kritis Bekerja!';
+    content.innerHTML = '<ul>' + alarms.map(a => `<li style="margin-bottom:6px;">${a}</li>`).join('') + '</ul>';
+    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>';
   }
 }
 
+// ── WIDGET 3: GENERATOR LOG TERMINAL RIWAYAT ──
+function generateAlarmLogs(dataBuffer) {
+  const terminal = document.getElementById('alarmLogTerminal');
+  const counter = document.getElementById('logCounter');
+  let logHtml = '';
+  let totalAnomalies = 0;
+
+  for (let i = dataBuffer.length - 1; i >= 0; i--) {
+    const item = dataBuffer[i];
+    const d = parseFloat(item.DO_mgL); const p = parseFloat(item.pH); const t = parseFloat(item.temperature_C); const s = parseFloat(item.salinity_ppt);
+    const shortTime = item.timestamp.includes(' ') ? item.timestamp.split(' ')[1].substring(0, 5) : "--:--";
+    let anomaliesInRecord = [];
+
+    if (d < 4.5) anomaliesInRecord.push({ param: "Oksigen Rendah", val: `${d} mg/L`, saran: "Nyalakan kincir air segera." });
+    if (d > 8.0) anomaliesInRecord.push({ param: "Oksigen Tinggi", val: `${d} mg/L`, saran: "Evaluasi penggunaan kincir." });
+    if (p < 7.5) anomaliesInRecord.push({ param: "pH Asam", val: p, saran: "Taburkan kapur pertanian dolomit." });
+    if (p > 8.5) anomaliesInRecord.push({ param: "pH Basa", val: p, saran: "Aplikasikan molase / asam organik." });
+    if (t < 25.0) anomaliesInRecord.push({ param: "Suhu Drop", val: `${t}°C`, saran: "Kurangi kuantitas tebar pakan." });
+    if (t > 31.0) anomaliesInRecord.push({ param: "Suhu Berlebih", val: `${t}°C`, saran: "Tambahkan debit pasokan air kolam." });
+    if (s > 1.0) anomaliesInRecord.push({ param: "Salinitas Naik", val: `${s} ppt`, saran: "Lakukan pengenceran dengan air tawar." });
+
+    if (anomaliesInRecord.length > 0) {
+      anomaliesInRecord.forEach(anom => {
+        totalAnomalies++;
+        logHtml += `
+          <div class="log-item danger-log">
+            <span class="log-time">${shortTime} WIB</span>
+            <div class="log-msg">
+              Sensor mendeteksi pelanggaran batas pada <strong>${anom.param}</strong> (Nilai: <b>${anom.val}</b>).
+              <div><span class="log-saran">💡 Tindakan Cepat: ${anom.saran}</span></div>
+            </div>
+          </div>
+        `;
+      });
+    }
+  }
+
+  if (totalAnomalies > 0) {
+    terminal.innerHTML = logHtml;
+    counter.textContent = `${totalAnomalies} Anomali Terdeteksi Hari Ini`;
+    counter.style.color = "var(--danger)";
+    counter.style.background = "#fee2e2";
+  } else {
+    terminal.innerHTML = '<p style="color: var(--text-2); font-size: 0.9rem; font-style: italic; padding: 0.5rem 0;">✅ Log Terminal Bersih. Belum ada rekam jejak anomali / peringatan sistem pada jendela waktu ini.</p>';
+    counter.textContent = `0 Masalah Terdeteksi`;
+    counter.style.color = "var(--text-2)";
+    counter.style.background = "var(--surface-3)";
+  }
+}
+
+// ── REAL-TIME LISTENER DATA TELEMETRI ──
+function listenTelemetry() {
+  const wib = getWibDate();
+  const mm = String(wib.getMonth()+1).padStart(2,'0');
+  const dd = String(wib.getDate()).padStart(2,'0');
+  let yymmdd = `${wib.getFullYear()}-${mm}-${dd}`;
+  let yymm = `${wib.getFullYear()}-${mm}`;
+
+  if (currentTelemetryRef) currentTelemetryRef.off(); 
+
+  currentTelemetryRef = db.ref(`forecast_2026/${yymm}/${yymmdd}`);
+  currentTelemetryRef.on('value', (snapshot) => {
+    let data = snapshot.val();
+    
+    if (!data) {
+      db.ref('forecast_2024/2024-08/2024-08-20').once('value', (fallbackSnapshot) => {
+        const fallbackData = fallbackSnapshot.val();
+        if (fallbackData) {
+          processTelemetryData(fallbackData, "2024-08-20");
+        } else {
+          db.ref(`forecast/${yymmdd}`).once('value', (oldSnapshot) => {
+            const oldData = oldSnapshot.val();
+            if (oldData) processTelemetryData(oldData, yymmdd);
+          });
+        }
+      });
+      return;
+    }
+    
+    processTelemetryData(data, yymmdd);
+  });
+}
+
+function processTelemetryData(data, dateKey) {
+  const keys = Object.keys(data).sort((a, b) => a.localeCompare(b, undefined, {numeric: true})); 
+  const recentKeys = keys.slice(-25); 
+  
+  let lbls=[], vDO=[], vPH=[], vSU=[], vSA  =[];
+  let mxDO=[], mnDO=[], mxPH=[], mnPH=[], mxSU=[], mnSU=[], mxSA=[], mnSA=[];
+  
+  expBuf = [];
+  let latest = null;
+
+  recentKeys.forEach(k => {
+    const item = data[k];
+    if(typeof item !== 'object' || item === null) return; 
+    
+    const ts = item.timestamp || `${dateKey} ${k.replace(/-/g,':')}`;
+    
+    const valDO = item.DO_mgL ?? item.DO ?? item.do ?? 0;
+    const valPH = item.pH ?? item.ph ?? 0;
+    const valSUHU = item.temperature_C ?? item.Suhu ?? item.suhu ?? item.temperature ?? item.temp ?? 0;
+    const valSAL = item.salinity_ppt ?? item.Salinitas ?? item.salinitas ?? item.salinity ?? item.sal ?? 0;
+
+    latest = {
+      timestamp: ts, DO_mgL: parseFloat(valDO).toFixed(2), pH: parseFloat(valPH).toFixed(2),
+      temperature_C: parseFloat(valSUHU).toFixed(1), salinity_ppt: parseFloat(valSAL).toFixed(2)
+    };
+    expBuf.push(latest);
+    
+    let shortTime = ts.includes(' ') ? ts.split(' ')[1].substring(0, 5) : (k.length >= 5 ? k.substring(0, 5) : "--:--");
+    
+    lbls.push(shortTime);
+    vDO.push(parseFloat(latest.DO_mgL)); mxDO.push(8.0); mnDO.push(4.5);
+    vPH.push(parseFloat(latest.pH)); mxPH.push(8.5); mnPH.push(7.5);
+    vSU.push(parseFloat(latest.temperature_C)); mxSU.push(31.0); mnSU.push(25.0);
+    vSA.push(parseFloat(latest.salinity_ppt)); mxSA.push(1.0); mnSA.push(0.0);
+  });
+
+  if (latest) {
+    document.getElementById('rtDO').textContent = latest.DO_mgL;
+    document.getElementById('rtPH').textContent = latest.pH;
+    document.getElementById('rtSU').textContent = latest.temperature_C;
+    document.getElementById('rtSA').textContent = latest.salinity_ppt;
+    
+    // PEMANGGILAN 3 WIDGET CERDAS SECARA BERSAMAAN
+    calculateAIInsights(latest);       // 1. Kesimpulan AI Text Format
+    checkAlarmsRealtime(latest);       // 2. Alarm Kedip Merah/Hijau
+    generateAlarmLogs(expBuf);         // 3. Log Terminal Terminal Riwayat
+  }
+
+  updMain(mains.DO, lbls, vDO, mxDO, mnDO);
+  updMain(mains.pH, lbls, vPH, mxPH, mnPH);
+  updMain(mains.Suhu, lbls, vSU, mxSU, mnSU);
+  updMain(mains.Sal, lbls, vSA, mxSA, mnSA);
+}
+
 function updMain(ch, lbl, d, mx, mn) {
+  if(!ch || !ch.data) return;
   ch.data.labels = lbl;
   ch.data.datasets[0].data = d;
   ch.data.datasets[1].data = mx;
@@ -645,80 +767,17 @@ function updMain(ch, lbl, d, mx, mn) {
   ch.update();
 }
 
-async function fetchTelemetry() {
-  syncCountdown = 120;
-  try {
-    const wib = getWibDate();
-    const mm = String(wib.getMonth()+1).padStart(2,'0');
-    const dd = String(wib.getDate()).padStart(2,'0');
-    let yymmdd = `${wib.getFullYear()}-${mm}-${dd}`;
-    const cb = new Date().getTime();
-    
-    let url = `${FB}forecast/${yymmdd}.json?auth=${authToken}&_nocache=${cb}`;
-    let r = await fetch(url, { cache: 'no-store' });
-    if (!r.ok && r.status === 401) { doLogout(); return; }
-
-    let data = await r.json();
-    if (!data) {
-      yymmdd = "2024-08-20"; // Fallback demo data
-      url = `${FB}forecast/${yymmdd}.json?auth=${authToken}&_nocache=${cb}`;
-      r = await fetch(url, { cache: 'no-store' });
-      data = await r.json();
-    }
-    if (!data) return; 
-
-    const keys = Object.keys(data).sort((a, b) => a.localeCompare(b, undefined, {numeric: true})); 
-    const recentKeys = keys.slice(-25); 
-    
-    let lbls=[], vDO=[], vPH=[], vSU=[], vSA=[];
-    let mxDO=[], mnDO=[], mxPH=[], mnPH=[], mxSU=[], mnSU=[], mxSA=[], mnSA=[];
-    expBuf = []; let latest = null;
-
-    recentKeys.forEach(k => {
-      const item = data[k];
-      if(typeof item !== 'object' || item === null) return; 
-      
-      const ts = item.timestamp || `${yymmdd} ${k.replace(/-/g,':')}`;
-      latest = {
-        timestamp: ts,
-        DO_mgL: parseFloat(item.DO_mgL||0).toFixed(2),
-        pH: parseFloat(item.pH||0).toFixed(2),
-        temperature_C: parseFloat(item.temperature_C||0).toFixed(1),
-        salinity_ppt: parseFloat(item.salinity_ppt||0).toFixed(2)
-      };
-      expBuf.push(latest);
-      
-      let shortTime = ts.includes(' ') ? ts.split(' ')[1].substring(0, 5) : (k.length >= 5 ? k.substring(0, 5) : "--:--");
-      
-      lbls.push(shortTime);
-      vDO.push(parseFloat(latest.DO_mgL)); mxDO.push(8.0); mnDO.push(4.5);
-      vPH.push(parseFloat(latest.pH)); mxPH.push(8.5); mnPH.push(7.5);
-      vSU.push(parseFloat(latest.temperature_C)); mxSU.push(31.0); mnSU.push(25.0);
-      vSA.push(parseFloat(latest.salinity_ppt)); mxSA.push(1.0); mnSA.push(0.0);
-    });
-
-    if (latest) {
-      processPayload(latest);
-      calculateAIInsights(latest);
-    }
-
-    updMain(mains.DO, lbls, vDO, mxDO, mnDO);
-    updMain(mains.pH, lbls, vPH, mxPH, mnPH);
-    updMain(mains.Suhu, lbls, vSU, mxSU, mnSU);
-    updMain(mains.Sal, lbls, vSA, mxSA, mnSA);
-
-  } catch(e) {} 
-}
-
 function tickTimer() {
-  syncCountdown--;
-  if (syncCountdown <= 0) fetchTelemetry();
-  
-  const m = Math.floor(syncCountdown / 60);
-  const s = syncCountdown % 60;
-  document.getElementById('syncTimer').textContent = `Next Sync: 0${m}:${s.toString().padStart(2, '0')}`;
-  
   const wib = getWibDate();
+  const mm = String(wib.getMonth()+1).padStart(2,'0');
+  const dd = String(wib.getDate()).padStart(2,'0');
+  let yymmdd = `${wib.getFullYear()}-${mm}-${dd}`;
+
+  if (yymmdd !== lastDateString && systemStarted) {
+    lastDateString = yymmdd;
+    listenTelemetry();
+  }
+  
   const liveClockEl = document.getElementById('liveClock');
   if (liveClockEl) liveClockEl.textContent = wib.toLocaleTimeString('id-ID', { hour12: false }) + ' WIB';
   
@@ -728,12 +787,12 @@ function tickTimer() {
   const ambTempEl = document.getElementById('ambTemp');
   if (ambTempEl) {
     const amb = Math.round(27 + 6*Math.max(0, Math.sin((wib.getHours()-8)*Math.PI/12)));
-    ambTempEl.textContent = amb + ' °C';
+    ambTempEl.textContent = amb + '°C';
   }
 }
 
 function downloadCSV() {
-  if (!expBuf.length) { alert('Data belum tersedia dari ESP32.'); return; }
+  if (!expBuf.length) { alert('Data telemetri streaming belum masuk.'); return; }
   let csv = 'Timestamp,DO_mgL,pH,Suhu_C,Salinitas_ppt\n';
   expBuf.forEach(f => csv += `${f.timestamp},${f.DO_mgL},${f.pH},${f.temperature_C},${f.salinity_ppt}\n`);
   const a = document.createElement('a');
@@ -742,19 +801,22 @@ function downloadCSV() {
   a.click();
 }
 
-let systemStarted = false;
 function startSystem() {
   if (systemStarted) return;
   systemStarted = true;
 
+  const wib = getWibDate();
+  const mm = String(wib.getMonth()+1).padStart(2,'0');
+  const dd = String(wib.getDate()).padStart(2,'0');
+  lastDateString = `${wib.getFullYear()}-${mm}-${dd}`;
+
   initCharts();
   setTimeout(initMap, 500);
   
-  fetchStatus();
-  fetchTelemetry();
+  listenStatus();
+  listenTelemetry();
   
   setInterval(tickTimer, 1000); 
-  setInterval(fetchStatus, 4000); 
 }
 </script>
 </body>
