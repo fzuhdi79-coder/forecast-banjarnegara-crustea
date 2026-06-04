@@ -66,6 +66,42 @@ body {
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
+/* -- EDITABLE LOGO COMPONENT STYLE -- */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  text-align: left;
+}
+.logo-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2);
+  color: var(--primary);
+  padding: 0.6rem;
+  border-radius: var(--rad-sm);
+  border: 1px solid var(--border);
+}
+.logo-text-group {
+  display: flex;
+  flex-direction: column;
+}
+.logo-main-text {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+.logo-sub-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
 /* -- LOGIN SCREEN -- */
 #loginScreen {
   position: fixed; inset: 0; z-index: 9999;
@@ -75,15 +111,17 @@ body {
 }
 .login-box {
   background: var(--surface);
-  width: 100%; max-width: 400px;
+  width: 100%; max-width: 420px;
   padding: 3rem 2.5rem;
   border-radius: var(--rad);
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--border);
-  text-align: center;
 }
-.login-box h1 { margin-bottom: 0.25rem; color: var(--text-main); font-size: 1.75rem; font-weight: 800; letter-spacing: -0.5px;}
-.login-box p { color: var(--text-muted); margin-bottom: 2.5rem; font-size: 0.95rem;}
+.login-logo-center {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
 .inp-group { margin-bottom: 1.5rem; text-align: left; }
 .inp-group label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem;}
 .inp-group input {
@@ -108,14 +146,13 @@ body {
 /* -- LAYOUT MAIN -- */
 #appMain { display: flex; min-height: 100vh; }
 .sidebar {
-  width: 270px; background: var(--surface);
+  width: 280px; background: var(--surface);
   border-right: 1px solid var(--border);
   display: flex; flex-direction: column;
   position: sticky; top: 0; height: 100vh;
   z-index: 50;
 }
-.sb-head { padding: 2rem 1.5rem; }
-.sb-head h1 { font-size: 1.35rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;}
+.sb-head { padding: 2.25rem 1.5rem 2rem 1.5rem; }
 .sb-nav { padding: 0 1rem; flex: 1; overflow-y: auto;}
 .nav-item {
   display: flex; align-items: center; gap: 0.75rem;
@@ -146,42 +183,37 @@ body {
 .dot.on { background: var(--success); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); animation: pulse 2s infinite;}
 .dot.off { background: var(--danger); box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2); }
 
-/* -- WIDGETS (AI & ALARM) -- */
+/* -- WIDGETS (UNIFORM LIGHT PALETTE) -- */
 .ai-box {
-  background: #0f172a; /* Ultra Premium Dark Slate */
-  color: white; border-radius: var(--rad); padding: 1.75rem 2rem;
+  background: var(--surface);
+  color: var(--text-main); border-radius: var(--rad); padding: 1.75rem 2rem;
   box-shadow: var(--shadow-md);
   margin-bottom: 1.5rem;
-  border: 1px solid #1e293b;
+  border: 1px solid var(--border);
   position: relative; overflow: hidden;
 }
-/* Aksen gradient sangat halus di pojok */
-.ai-box::before { content: ""; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: radial-gradient(circle, rgba(14,165,233,0.15) 0%, transparent 70%); border-radius: 50%; }
-
-.ai-box h3 { font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.25rem; color: #e2e8f0; letter-spacing: -0.25px;}
+.ai-box h3 { font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.25rem; color: var(--text-main); letter-spacing: -0.25px;}
 .ai-insight-content {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-2);
   padding: 1.25rem 1.5rem;
   border-radius: var(--rad-sm);
   font-size: 0.95rem; line-height: 1.7;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text-main);
 }
 
 .alarm-widget {
+  background: var(--surface);
   border-radius: var(--rad); padding: 1.5rem 2rem; margin-bottom: 2.5rem;
   box-shadow: var(--shadow-md); transition: all 0.4s ease; border: 1px solid var(--border);
+  border-left: 6px solid var(--success);
 }
-.alarm-widget.safe { background: var(--surface); border-left: 6px solid var(--success); }
-.alarm-widget.danger { background: var(--danger-bg); border-left: 6px solid var(--danger); border-color: #fca5a5; }
+.alarm-widget.danger { border-left-color: var(--danger); }
 .alarm-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
-.alarm-header h3 { font-size: 1.2rem; font-weight: 800; margin: 0; letter-spacing: -0.5px;}
-.alarm-widget.safe h3 { color: var(--text-main); }
-.alarm-widget.danger h3 { color: #991b1b; }
-.alarm-content p { font-size: 0.95rem; line-height: 1.6; font-weight: 500;}
-.alarm-widget.safe p { color: var(--text-muted); }
-.alarm-widget.danger p { color: #991b1b; }
+.alarm-header h3 { font-size: 1.2rem; font-weight: 800; margin: 0; letter-spacing: -0.5px; color: var(--text-main); }
+.alarm-content p { font-size: 0.95rem; line-height: 1.6; font-weight: 500; color: var(--text-muted); }
 .alarm-content ul { margin-left: 1.5rem; margin-top: 0.5rem; line-height: 1.7;}
-.alarm-content li { margin-bottom: 0.25rem; font-size: 0.95rem; font-weight: 500; color: #7f1d1d;}
+.alarm-content li { margin-bottom: 0.25rem; font-size: 0.95rem; font-weight: 500; color: var(--text-main);}
 
 /* -- SENSOR CARDS -- */
 .grid-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
@@ -196,8 +228,8 @@ body {
 .val { font-size: 2.75rem; font-weight: 800; color: var(--text-main); letter-spacing: -1.5px; line-height: 1;}
 .unit { font-size: 1rem; color: var(--text-muted); font-weight: 600;}
 
-/* Icon Wrappers inside Cards */
-.icon-wrap { padding: 8px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+/* Uniform Neutral Icon Wrappers inside Cards */
+.icon-wrap { padding: 8px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: var(--surface-2); color: var(--primary); }
 
 /* -- LOG TERMINAL -- */
 .log-container { max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; padding-right: 8px; }
@@ -215,7 +247,7 @@ body {
 .log-item .log-msg { flex: 1; color: var(--text-main); line-height: 1.5; font-weight: 500;}
 .log-item .log-saran { margin-top: 0.5rem; font-size: 0.85rem; color: #b91c1c; font-weight: 700; display: inline-block; }
 
-/* -- CHART GRID (SCROLLABLE) -- */
+/* -- CHART GRID -- */
 .grid-charts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 2.5rem; }
 .chart-card-wrapper {
   background: var(--surface);
@@ -225,7 +257,7 @@ body {
   overflow: hidden;
   box-shadow: var(--shadow-sm);
 }
-.chart-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); background: #fafafa; }
+.chart-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); background: var(--surface); }
 .chart-header h3 { font-weight: 800; font-size: 1.05rem; color: var(--text-main); letter-spacing: -0.25px;}
 .chart-header p { font-size: 0.85rem; color: var(--text-muted); margin-top: 2px; font-weight: 500;}
 
@@ -249,7 +281,7 @@ body {
   .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border);}
   .sb-nav { display: flex; flex-wrap: wrap; padding: 1rem; gap: 0.5rem; overflow-y: visible;}
   .nav-item { margin-bottom: 0; }
-  .sb-head { padding: 1.5rem; text-align: center; }
+  .sb-head { padding: 1.5rem; text-align: center; display: flex; justify-content: center;}
   .sb-foot { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
   .content { padding: 1.5rem; }
   .top-bar { flex-direction: column; align-items: flex-start; }
@@ -260,8 +292,24 @@ body {
 
 <div id="loginScreen">
   <div class="login-box">
-    <h1>Crustea EBII</h1>
-    <p>Pro Command Center Authentication</p>
+    <!-- ======================================================== -->
+    <!-- LOGO LOGIN SCREEN (SILAHKAN DIEDIT SESUAI KEINGINAN)     -->
+    <!-- ======================================================== -->
+    <div class="login-logo-center">
+      <div class="logo-container">
+        <div class="logo-icon-box">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+          </svg>
+        </div>
+        <div class="logo-text-group">
+          <span class="logo-main-text">Crustea EBII</span>
+          <span class="logo-sub-text">Command Center</span>
+        </div>
+      </div>
+    </div>
+    <!-- ======================================================== -->
+    
     <div class="inp-group">
       <label>Email Pengguna</label>
       <input type="email" id="inEmail" placeholder="Masukkan email Anda">
@@ -278,7 +326,21 @@ body {
 <div id="appMain" style="display: none;">
   <aside class="sidebar">
     <div class="sb-head">
-      <h1>Crustea EBII</h1>
+      <!-- ======================================================== -->
+      <!-- LOGO SIDEBAR UTAMA (SILAHKAN DIEDIT SESUAI KEINGINAN)    -->
+      <!-- ======================================================== -->
+      <div class="logo-container">
+        <div class="logo-icon-box">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+          </svg>
+        </div>
+        <div class="logo-text-group">
+          <span class="logo-main-text">Crustea EBII</span>
+          <span class="logo-sub-text">Command Center</span>
+        </div>
+      </div>
+      <!-- ======================================================== -->
     </div>
     <nav class="sb-nav">
       <a href="#" class="nav-item active">
@@ -330,7 +392,7 @@ body {
       </div>
     </div>
 
-    <div id="alarmWidget" class="alarm-widget safe">
+    <div id="alarmWidget" class="alarm-widget">
       <div class="alarm-header">
         <svg id="alarmIcon" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -346,7 +408,7 @@ body {
       <div class="card">
         <div class="card-head">
           <h3>Oksigen (DO)</h3>
-          <div class="icon-wrap" style="background: #e0f2fe; color: #0284c7;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg></div>
+          <div class="icon-wrap"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg></div>
         </div>
         <div class="val-wrap">
           <div class="val" id="rtDO">--</div>
@@ -356,7 +418,7 @@ body {
       <div class="card">
         <div class="card-head">
           <h3>Tingkat pH</h3>
-          <div class="icon-wrap" style="background: #fef3c7; color: #d97706;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg></div>
+          <div class="icon-wrap"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg></div>
         </div>
         <div class="val-wrap">
           <div class="val" id="rtPH">--</div>
@@ -366,7 +428,7 @@ body {
       <div class="card">
         <div class="card-head">
           <h3>Suhu Air</h3>
-          <div class="icon-wrap" style="background: #fee2e2; color: #dc2626;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg></div>
+          <div class="icon-wrap"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg></div>
         </div>
         <div class="val-wrap">
           <div class="val" id="rtSU">--</div>
@@ -376,7 +438,7 @@ body {
       <div class="card">
         <div class="card-head">
           <h3>Salinitas</h3>
-          <div class="icon-wrap" style="background: #e0e7ff; color: #2563eb;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg></div>
+          <div class="icon-wrap"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg></div>
         </div>
         <div class="val-wrap">
           <div class="val" id="rtSA">--</div>
@@ -586,7 +648,7 @@ function toggleRelay() {
   db.ref('forecast/status').set(next);
 }
 
-// ── WIDGET 1: ANALISIS PAKAR INSTAN ──
+// ── WIDGET 1: ANALISIS PAKAR INSTAN (UNIFORM THEME) ──
 function calculateAIInsights(latest) {
   const d = parseFloat(latest.DO_mgL); const p = parseFloat(latest.pH); const t = parseFloat(latest.temperature_C);
   const aiEl = document.getElementById('aiInsight');
@@ -596,12 +658,12 @@ function calculateAIInsights(latest) {
   if (d >= 4.5 && p >= 7.5 && p <= 8.5 && t >= 25 && t <= 31) {
     insightHtml = `
       <div style="display:flex; align-items:flex-start; gap:16px;">
-        <div style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 10px; border-radius: 12px; flex-shrink:0;">
+        <div style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 10px; border-radius: 12px; flex-shrink:0; border: 1px solid rgba(16, 185, 129, 0.2);">
           <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
         </div>
         <div>
-          <b style="color:#34d399; font-size:1.05rem; display:block; margin-bottom:4px;">Ekosistem Terpantau Optimal</b>
-          <span style="color:#cbd5e1; font-size:0.95rem; line-height:1.6; display:block;">Seluruh indikator kualitas air (Oksigen, Keasaman, Suhu) berada pada rentang yang direkomendasikan. Lanjutkan prosedur perawatan standar.</span>
+          <b style="color:var(--success); font-size:1.05rem; display:block; margin-bottom:4px;">Ekosistem Terpantau Optimal</b>
+          <span style="color:var(--text-main); font-size:0.95rem; line-height:1.6; display:block;">Seluruh indikator kualitas air (Oksigen, Keasaman, Suhu) berada pada rentang yang direkomendasikan. Lanjutkan prosedur perawatan standar.</span>
         </div>
       </div>`;
   } else {
@@ -612,23 +674,23 @@ function calculateAIInsights(latest) {
 
     insightHtml = `
       <div style="display:flex; align-items:flex-start; gap:16px;">
-        <div style="background: rgba(239, 68, 68, 0.15); color: #ef4444; padding: 10px; border-radius: 12px; flex-shrink: 0;">
+        <div style="background: rgba(239, 68, 68, 0.1); color: var(--danger); padding: 10px; border-radius: 12px; flex-shrink: 0; border: 1px solid rgba(239, 68, 68, 0.2);">
           <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
         </div>
         <div>
-          <b style="color:#fca5a5; font-size:1.05rem; display:block; margin-bottom:4px;">Peringatan Sistem: Deviasi Parameter</b>
-          <span style="color:#cbd5e1; font-size:0.95rem; line-height:1.6; display:block;">Sistem pakar mengidentifikasi anomali berikut yang membutuhkan perhatian:</span>
-          <ul class="ai-list" style="margin-top: 8px; margin-bottom: 8px; padding-left: 20px; color: #94a3b8; font-size: 0.95rem;">
+          <b style="color:var(--danger); font-size:1.05rem; display:block; margin-bottom:4px;">Peringatan Sistem: Deviasi Parameter</b>
+          <span style="color:var(--text-main); font-size:0.95rem; line-height:1.6; display:block;">Sistem pakar mengidentifikasi anomali berikut yang membutuhkan perhatian:</span>
+          <ul class="ai-list" style="margin-top: 8px; margin-bottom: 8px; padding-left: 20px; color: var(--text-muted); font-size: 0.95rem;">
             ${specificIssues.map(issue => `<li style="margin-bottom:4px;">${issue}</li>`).join('')}
           </ul>
-          <i style="color:#64748b; font-size:0.85rem;">Periksa Log Terminal untuk tindakan korektif operasional.</i>
+          <i style="color:var(--text-muted); font-size:0.85rem;">Periksa Log Terminal untuk tindakan korektif operasional.</i>
         </div>
       </div>`;
   }
   aiEl.innerHTML = insightHtml;
 }
 
-// ── WIDGET 2: STATUS REALTIME SAAT INI ──
+// ── WIDGET 2: STATUS REALTIME SAAT INI (UNIFORM THEME) ──
 function checkAlarmsRealtime(latest) {
   const d = parseFloat(latest.DO_mgL); const p = parseFloat(latest.pH); const t = parseFloat(latest.temperature_C); const s = parseFloat(latest.salinity_ppt);
   let alarms = [];
@@ -650,7 +712,7 @@ function checkAlarmsRealtime(latest) {
   const icon = document.getElementById('alarmIcon');
 
   if (alarms.length === 0) {
-    widget.className = 'alarm-widget safe'; title.textContent = 'Status Realtime: Normal';
+    widget.className = 'alarm-widget'; title.textContent = 'Status Realtime: Normal';
     content.innerHTML = '<p>Pembacaan sensor terbaru selaras dengan standar mutu air.</p>';
     icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
   } else {
@@ -663,21 +725,21 @@ function checkAlarmsRealtime(latest) {
       let strokeColor = '';
       
       if (a.type === 'danger') {
-        bgCircle = 'rgba(239, 68, 68, 0.12)';
+        bgCircle = 'rgba(239, 68, 68, 0.08)';
         strokeColor = 'var(--danger)';
         iconSvg = `<svg width="18" height="18" fill="none" stroke="${strokeColor}" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
       } else if (a.type === 'warning') {
-        bgCircle = 'rgba(245, 158, 11, 0.12)';
+        bgCircle = 'rgba(245, 158, 11, 0.08)';
         strokeColor = 'var(--warning)';
         iconSvg = `<svg width="18" height="18" fill="none" stroke="${strokeColor}" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
       } else {
-        bgCircle = 'rgba(14, 165, 233, 0.12)';
+        bgCircle = 'rgba(14, 165, 233, 0.08)';
         strokeColor = 'var(--info)';
         iconSvg = `<svg width="18" height="18" fill="none" stroke="${strokeColor}" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
       }
 
       cardsHtml += `
-        <div style="display: flex; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--rad-sm); padding: 12px 16px; gap: 14px; box-shadow: var(--shadow-sm);">
+        <div style="display: flex; align-items: center; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--rad-sm); padding: 12px 16px; gap: 14px; box-shadow: var(--shadow-sm);">
           <div style="width: 38px; height: 38px; border-radius: 50%; background: ${bgCircle}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
             ${iconSvg}
           </div>
@@ -776,11 +838,9 @@ function listenTelemetry() {
   });
 }
 
-// MENGAMBIL SEMUA DATA (TANPA LIMIT) & MENGUPDATE CHART AGAR BISA SCROLL
 function processTelemetryData(data, dateKey) {
   const keys = Object.keys(data).sort((a, b) => a.localeCompare(b, undefined, {numeric: true})); 
-  
-  const recentKeys = keys; // Memuat semua data 
+  const recentKeys = keys; 
   
   let lbls=[], vDO=[], vPH=[], vSU=[], vSA  =[];
   let mxDO=[], mnDO=[], mxPH=[], mnPH=[], mxSU=[], mnSU=[], mxSA=[], mnSA=[];
@@ -831,7 +891,6 @@ function processTelemetryData(data, dateKey) {
   updMain(mains.Sal, lbls, vSA, mxSA, mnSA);
 }
 
-// AUTO-RESIZE CHART UNTUK SCROLLING HORIZONTAL
 function updMain(ch, lbl, d, mx, mn) {
   if(!ch || !ch.data) return;
   ch.data.labels = lbl;
@@ -839,13 +898,11 @@ function updMain(ch, lbl, d, mx, mn) {
   ch.data.datasets[1].data = mx;
   ch.data.datasets[2].data = mn;
   
-  // Lebar grafik dinamis: akan melar ke samping setiap ada penambahan data per 2 menit
   let newWidth = '100%';
   if (lbl.length > 20) {
-    newWidth = (lbl.length * 45) + 'px'; // Atur jarak antar titik sumbu X (45px)
+    newWidth = (lbl.length * 45) + 'px'; 
   }
   ch.canvas.parentNode.style.width = newWidth;
-  
   ch.update();
 }
 
