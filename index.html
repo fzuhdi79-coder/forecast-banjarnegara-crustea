@@ -162,7 +162,6 @@ body {
   gap: 1.5rem; margin-bottom: 2rem;
 }
 
-/* Kontainer Chart Responsif standar */
 .chart-container {
   position: relative;
   height: 300px;
@@ -210,7 +209,7 @@ body {
     </div>
     <div class="inp-group">
       <label>Kata Sandi</label>
-      <input type="password" id="inPass" placeholder="••••••••">
+      <input type="password" id="inPass" placeholder="••••••••" onkeypress="if(event.key==='Enter') doLogin()">
     </div>
     <button class="btn-login" onclick="doLogin()">Autentikasi Sistem</button>
     <div id="loginError">Autentikasi Gagal. Periksa kembali kredensial Anda.</div>
@@ -235,11 +234,16 @@ body {
         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
         Ekspor Data (CSV)
       </a>
+      
+      <a href="#" class="nav-item" onclick="doLogout()" style="margin-top: 20px; color: var(--danger);">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+        Keluar (Logout)
+      </a>
     </nav>
     <div class="sb-foot">
       <div id="syncTimer" class="mono" style="margin-bottom:4px; font-weight:600; color:var(--primary)">Next Sync: --:--</div>
       <div id="liveClock" class="mono">--:--:-- WIB</div>
-      <div style="margin-top: 8px;">v2.5.0-pro (Stable)</div>
+      <div style="margin-top: 8px;">v2.6.0-pro (Auto-Login)</div>
     </div>
   </aside>
 
@@ -374,23 +378,31 @@ body {
 // ── KONFIGURASI FIREBASE ──
 // GANTI TEKS DI BAWAH INI DENGAN API KEY FIREBASE MILIK ANDA
 const API_KEY = "AIzaSyDoBiXA94eozZtZr5p6_FYnCBujj1fl8fs"; 
-
-// INI ADALAH DATABASE ASLI ANDA, JANGAN DIUBAH
 const FB = "https://forecast-banjarnegara-default-rtdb.asia-southeast1.firebasedatabase.app/";
 
-let authToken = null;
+// ── SISTEM PERSISTENT LOGIN (LOCAL STORAGE) ──
+let authToken = localStorage.getItem('crustea_auth_token') || null;
 let expBuf = [];
 let syncCountdown = 120; 
 let currentRelayStatus = "OFF";
 
-// ── UTILITAS WAKTU ─────────────────────────────
+// Cek otomatis saat web pertama kali dibuka
+window.addEventListener('load', () => {
+  if (authToken) {
+    // Jika ada token tersimpan, langsung masuk ke dashboard
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appMain').style.display = 'flex';
+    startSystem();
+  }
+});
+
 function getWibDate() {
   const d = new Date();
   const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
   return new Date(utc + (3600000 * 7));
 }
 
-// ── SISTEM AUTENTIKASI ─────────────────────────
+// ── FUNGSI LOGIN & LOGOUT ──
 async function doLogin() {
   const em = document.getElementById('inEmail').value;
   const pw = document.getElementById('inPass').value;
@@ -417,6 +429,9 @@ async function doLogin() {
       err.style.display = 'block';
     } else {
       authToken = data.idToken;
+      // SIMPAN TOKEN KE MEMORI BROWSER
+      localStorage.setItem('crustea_auth_token', authToken);
+      
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('appMain').style.display = 'flex';
       startSystem();
@@ -427,7 +442,13 @@ async function doLogin() {
   }
 }
 
-// ── INIT PETA LEAFLET ──────────────────────────
+function doLogout() {
+  // Hapus token dari memori dan muat ulang halaman
+  localStorage.removeItem('crustea_auth_token');
+  location.reload();
+}
+
+// ── INIT PETA LEAFLET ──
 let map;
 function initMap() {
   if (map) return;
@@ -440,7 +461,7 @@ function initMap() {
   document.getElementById('locName').textContent = "Lembah Serayu, Banjarnegara";
 }
 
-// ── INIT CHART.JS ─────────────────────────────
+// ── INIT CHART.JS ──
 function makeChart(ctxId, color, label, min, max) {
   return new Chart(document.getElementById(ctxId).getContext('2d'), {
     type: 'line',
@@ -484,14 +505,16 @@ function initCharts() {
   mains.Sal = makeChart('chartSal', '#3b82f6', 'Salinitas', 0, 5);
 }
 
-// ── PENARIKAN DATA FIREBASE ────────────────────
-
-// Fungsi Cek Status ESP32 (Membaca file status.json)
+// ── PENARIKAN DATA FIREBASE (DIPERBAIKI) ──
 async function fetchStatus() {
   try {
     const cb = new Date().getTime();
-    const r = await fetch(`${FB}status.json?auth=${authToken}&_nocache=${cb}`);
+    const r = await fetch(`${FB}forecast/status.json?auth=${authToken}&_nocache=${cb}`);
+    
+    // Jika token kedaluwarsa (401), otomatis log out
+    if (!r.ok && r.status === 401) { doLogout(); return; }
     if (!r.ok) return;
+
     const v = await r.json(); 
     
     const dt = document.getElementById('hwDot');
@@ -514,11 +537,10 @@ async function fetchStatus() {
   } catch(e) {}
 }
 
-// Fungsi Tombol Nyala/Mati ESP32
 async function toggleRelay() {
   const next = currentRelayStatus === "ON" ? "OFF" : "ON";
   try {
-    await fetch(`${FB}status.json?auth=${authToken}`, { 
+    await fetch(`${FB}forecast/status.json?auth=${authToken}`, { 
       method:'PUT', 
       headers: {"Content-Type": "application/json"}, 
       body: JSON.stringify(next) 
@@ -553,7 +575,6 @@ function calculateAIInsights(latest) {
   }
 }
 
-// Fungsi Update Chart
 function updMain(ch, lbl, d, mx, mn) {
   ch.data.labels = lbl;
   ch.data.datasets[0].data = d;
@@ -568,19 +589,30 @@ async function fetchTelemetry() {
     const wib = getWibDate();
     const mm = String(wib.getMonth()+1).padStart(2,'0');
     const dd = String(wib.getDate()).padStart(2,'0');
-    const yymm = `${wib.getFullYear()}-${mm}`;
-    const yymmdd = `${wib.getFullYear()}-${mm}-${dd}`;
+    
+    let yymmdd = `${wib.getFullYear()}-${mm}-${dd}`;
     const cb = new Date().getTime();
     
-    const url = `${FB}forecast_2026/${yymm}/${yymmdd}.json?auth=${authToken}&_nocache=${cb}`;
-    const r = await fetch(url, { cache: 'no-store' });
+    // Tarik data hari ini
+    let url = `${FB}forecast/${yymmdd}.json?auth=${authToken}&_nocache=${cb}`;
+    let r = await fetch(url, { cache: 'no-store' });
     
-    if (!r.ok) return; 
+    // Jika token kedaluwarsa (401), paksa logout
+    if (!r.ok && r.status === 401) { doLogout(); return; }
+
+    let data = await r.json();
     
-    const data = await r.json();
+    // DEMO FALLBACK: JIKA HARI INI BELUM ADA DATA, TAMPILKAN DATA AGUSTUS 2024
+    if (!data) {
+      yymmdd = "2024-08-20"; 
+      url = `${FB}forecast/${yymmdd}.json?auth=${authToken}&_nocache=${cb}`;
+      r = await fetch(url, { cache: 'no-store' });
+      data = await r.json();
+    }
+    
     if (!data) return; 
 
-    // Sort secara numerik agar garis tidak zig-zag
+    // Sort numerik
     const keys = Object.keys(data).sort((a, b) => a.localeCompare(b, undefined, {numeric: true})); 
     const recentKeys = keys.slice(-25); 
     
@@ -592,6 +624,8 @@ async function fetchTelemetry() {
 
     recentKeys.forEach(k => {
       const item = data[k];
+      if(typeof item !== 'object' || item === null) return; 
+      
       const ts = item.timestamp || `${yymmdd} ${k.replace(/-/g,':')}`;
       latest = {
         timestamp: ts,
@@ -624,7 +658,6 @@ async function fetchTelemetry() {
   } catch(e) {} 
 }
 
-// ── EKSEKUSI WAKTU & BOOTSTRAP ────────────────
 function tickTimer() {
   syncCountdown--;
   if (syncCountdown <= 0) fetchTelemetry();
@@ -635,7 +668,6 @@ function tickTimer() {
   
   const wib = getWibDate();
   
-  // JAM DIGITAL DI SIDEBAR
   const liveClockEl = document.getElementById('liveClock');
   if (liveClockEl) liveClockEl.textContent = wib.toLocaleTimeString('id-ID', { hour12: false }) + ' WIB';
   
@@ -671,7 +703,7 @@ function startSystem() {
   fetchTelemetry();
   
   setInterval(tickTimer, 1000); 
-  setInterval(fetchStatus, 3000); 
+  setInterval(fetchStatus, 4000); 
 }
 </script>
 </body>
