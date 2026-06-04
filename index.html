@@ -633,16 +633,16 @@ function checkAlarmsRealtime(latest) {
   const d = parseFloat(latest.DO_mgL); const p = parseFloat(latest.pH); const t = parseFloat(latest.temperature_C); const s = parseFloat(latest.salinity_ppt);
   let alarms = [];
 
-  if (d < 4.5) alarms.push(`<b>Oksigen Drop (${d} mg/L):</b> Hidupkan aerator/kincir ke kecepatan penuh.`);
-  else if (d > 8.0) alarms.push(`<b>Oksigen Tinggi (${d} mg/L):</b> Supersaturasi, kurangi penggunaan kincir.`);
+  if (d < 4.5) alarms.push({ title: "Oksigen Drop", val: `${d} mg/L`, desc: "Hidupkan aerator/kincir ke kecepatan penuh.", type: "danger" });
+  else if (d > 8.0) alarms.push({ title: "Oksigen Tinggi", val: `${d} mg/L`, desc: "Supersaturasi, kurangi penggunaan kincir.", type: "warning" });
 
-  if (p < 7.5) alarms.push(`<b>pH Asam (${p}):</b> Tebarkan dolomit/kalsit secara bertahap.`);
-  else if (p > 8.5) alarms.push(`<b>pH Basa (${p}):</b> Berikan molase/probiotik atau flushing air.`);
+  if (p < 7.5) alarms.push({ title: "pH Asam", val: `${p}`, desc: "Tebarkan dolomit/kalsit secara bertahap.", type: "warning" });
+  else if (p > 8.5) alarms.push({ title: "pH Basa", val: `${p}`, desc: "Berikan molase/probiotik atau flushing air.", type: "warning" });
 
-  if (t < 25.0) alarms.push(`<b>Suhu Rendah (${t} °C):</b> Kurangi pakan harian agar tidak mengendap.`);
-  else if (t > 31.0) alarms.push(`<b>Suhu Tinggi (${t} °C):</b> Naikkan kedalaman air atau pasok air baru.`);
+  if (t < 25.0) alarms.push({ title: "Suhu Rendah", val: `${t} °C`, desc: "Kurangi pakan harian agar tidak mengendap.", type: "info" });
+  else if (t > 31.0) alarms.push({ title: "Suhu Tinggi", val: `${t} °C`, desc: "Naikkan kedalaman air atau pasok air baru.", type: "danger" });
 
-  if (s > 1.0) alarms.push(`<b>Salinitas (${s} ppt):</b> Tambahkan suplai air tawar.`);
+  if (s > 1.0) alarms.push({ title: "Salinitas", val: `${s} ppt`, desc: "Tambahkan suplai air tawar.", type: "info" });
 
   const widget = document.getElementById('alarmWidget');
   const title = document.getElementById('alarmTitle');
@@ -655,7 +655,42 @@ function checkAlarmsRealtime(latest) {
     icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
   } else {
     widget.className = 'alarm-widget danger'; title.textContent = 'Peringatan: Cek Parameter Kritis';
-    content.innerHTML = '<ul>' + alarms.map(a => `<li style="margin-bottom:6px;">${a}</li>`).join('') + '</ul>';
+    
+    let cardsHtml = '<div style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">';
+    alarms.forEach(a => {
+      let iconSvg = '';
+      let bgCircle = '';
+      let strokeColor = '';
+      
+      if (a.type === 'danger') {
+        bgCircle = 'rgba(239, 68, 68, 0.12)';
+        strokeColor = 'var(--danger)';
+        iconSvg = `<svg width="18" height="18" fill="none" stroke="${strokeColor}" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+      } else if (a.type === 'warning') {
+        bgCircle = 'rgba(245, 158, 11, 0.12)';
+        strokeColor = 'var(--warning)';
+        iconSvg = `<svg width="18" height="18" fill="none" stroke="${strokeColor}" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+      } else {
+        bgCircle = 'rgba(14, 165, 233, 0.12)';
+        strokeColor = 'var(--info)';
+        iconSvg = `<svg width="18" height="18" fill="none" stroke="${strokeColor}" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+      }
+
+      cardsHtml += `
+        <div style="display: flex; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: var(--rad-sm); padding: 12px 16px; gap: 14px; box-shadow: var(--shadow-sm);">
+          <div style="width: 38px; height: 38px; border-radius: 50%; background: ${bgCircle}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            ${iconSvg}
+          </div>
+          <div style="flex: 1;">
+            <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">${a.title} <span style="font-weight: 500; color: var(--text-muted); font-size: 0.85rem;">(${a.val})</span></div>
+            <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 2px; font-weight: 500;">${a.desc}</div>
+          </div>
+        </div>
+      `;
+    });
+    cardsHtml += '</div>';
+    
+    content.innerHTML = cardsHtml;
     icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>';
   }
 }
