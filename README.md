@@ -103,4 +103,5 @@ Perangkat Keras & Firmware (IoT):
 ## 👥 Kontributor & Pengembang
 
 Ahmad Faiz Zuhdi - Lead IoT Developer & Frontend/Backend Engineer - @fzuhdi79-coder
+
 PT Eco Karya Teknologi (Crustea) - Sponsor Proyek Pemantauan Budidaya Petambak Kabupaten Banjarnegara
