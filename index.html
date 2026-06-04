@@ -533,7 +533,7 @@ function initMap() {
   const pondLocation = [-7.3970, 109.6972]; 
   map = L.map('map').setView(pondLocation, 15);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
-  L.marker(pondLocation).addTo(map).bindPopup("<b style='font-family:Plus Jakarta Sans;'>EBII Node 01</b><br>Banjarnegara").openPopup();
+  L.marker(pondLocation).addTo(map).bindPopup("<b style='font-family:Plus Jakarta Sans;'>User 1</b><br>Banjarnegara").openPopup();
   document.getElementById('locName').textContent = "Kab. Banjarnegara";
 }
 
