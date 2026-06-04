@@ -518,11 +518,12 @@ function initCharts() {
   mains.Sal = makeChart('chartSal', '#3b82f6', 'Salinitas', 0, 5);
 }
 
-// ── PENARIKAN DATA FIREBASE ──
+// ── 1. PERBAIKAN JALUR STATUS (Sesuai dengan ESP32) ──
 async function fetchStatus() {
   try {
     const cb = new Date().getTime();
-    const r = await fetch(`${FB}forecast/status.json?auth=${authToken}&_nocache=${cb}`);
+    // UBAH: Hapus kata "forecast/" menjadi langsung "status.json"
+    const r = await fetch(`${FB}status.json?auth=${authToken}&_nocache=${cb}`);
     
     if (!r.ok && r.status === 401) { doLogout(); return; }
     if (!r.ok) return;
@@ -547,6 +548,91 @@ async function fetchStatus() {
       relayText.style.color = 'var(--text-2)';
     }
   } catch(e) {}
+}
+
+async function toggleRelay() {
+  const next = currentRelayStatus === "ON" ? "OFF" : "ON";
+  try {
+    // UBAH: Hapus kata "forecast/" menjadi langsung "status.json"
+    await fetch(`${FB}status.json?auth=${authToken}`, { 
+      method:'PUT', 
+      headers: {"Content-Type": "application/json"}, 
+      body: JSON.stringify(next) 
+    });
+    fetchStatus(); 
+  } catch(e) {}
+}
+
+// ... (Fungsi processPayload, calculateAIInsights, updMain biarkan saja) ...
+
+// ── 2. PERBAIKAN JALUR DATA SENSOR (Sesuai hierarki ESP32) ──
+async function fetchTelemetry() {
+  syncCountdown = 120;
+  try {
+    const wib = getWibDate();
+    const mm = String(wib.getMonth()+1).padStart(2,'0');
+    const dd = String(wib.getDate()).padStart(2,'0');
+    
+    // Siapkan format Bulan (YYYY-MM) dan Tanggal (YYYY-MM-DD)
+    const yymm = `${wib.getFullYear()}-${mm}`;
+    const yymmdd = `${wib.getFullYear()}-${mm}-${dd}`;
+    const cb = new Date().getTime();
+    
+    // UBAH: Arahkan URL ke folder forecast_2026/Bulan/Tanggal.json sesuai ESP32
+    let url = `${FB}forecast_2026/${yymm}/${yymmdd}.json?auth=${authToken}&_nocache=${cb}`;
+    let r = await fetch(url, { cache: 'no-store' });
+    
+    if (!r.ok && r.status === 401) { doLogout(); return; }
+
+    let data = await r.json();
+    
+    // (Opsional) Jika ESP32 belum mengirim data hari ini, web tidak akan error
+    if (!data) return; 
+
+    // Sort numerik
+    const keys = Object.keys(data).sort((a, b) => a.localeCompare(b, undefined, {numeric: true})); 
+    const recentKeys = keys.slice(-25); 
+    
+    let lbls=[], vDO=[], vPH=[], vSU=[], vSA=[];
+    let mxDO=[], mnDO=[], mxPH=[], mnPH=[], mxSU=[], mnSU=[], mxSA=[], mnSA=[];
+    
+    expBuf = [];
+    let latest = null;
+
+    recentKeys.forEach(k => {
+      const item = data[k];
+      if(typeof item !== 'object' || item === null) return; 
+      
+      const ts = item.timestamp || `${yymmdd} ${k.replace(/-/g,':')}`;
+      latest = {
+        timestamp: ts,
+        DO_mgL: parseFloat(item.DO_mgL||0).toFixed(2),
+        pH: parseFloat(item.pH||0).toFixed(2),
+        temperature_C: parseFloat(item.temperature_C||0).toFixed(1),
+        salinity_ppt: parseFloat(item.salinity_ppt||0).toFixed(2)
+      };
+      expBuf.push(latest);
+      
+      let shortTime = ts.includes(' ') ? ts.split(' ')[1].substring(0, 5) : (k.length >= 5 ? k.substring(0, 5) : "--:--");
+      
+      lbls.push(shortTime);
+      vDO.push(parseFloat(latest.DO_mgL)); mxDO.push(8.0); mnDO.push(4.5);
+      vPH.push(parseFloat(latest.pH)); mxPH.push(8.5); mnPH.push(7.5);
+      vSU.push(parseFloat(latest.temperature_C)); mxSU.push(31.0); mnSU.push(25.0);
+      vSA.push(parseFloat(latest.salinity_ppt)); mxSA.push(1.0); mnSA.push(0.0);
+    });
+
+    if (latest) {
+      processPayload(latest);
+      calculateAIInsights(latest);
+    }
+
+    updMain(mains.DO, lbls, vDO, mxDO, mnDO);
+    updMain(mains.pH, lbls, vPH, mxPH, mnPH);
+    updMain(mains.Suhu, lbls, vSU, mxSU, mnSU);
+    updMain(mains.Sal, lbls, vSA, mxSA, mnSA);
+
+  } catch(e) {} 
 }
 
 async function toggleRelay() {
