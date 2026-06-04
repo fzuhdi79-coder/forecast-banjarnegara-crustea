@@ -18,7 +18,6 @@ Sistem berjalan dengan interaksi dinamis antara Perangkat Keras, Awan Data, dan 
         ^                                               |
         |-------------(Membaca Perintah ON/OFF)---------|
 
----
 
 ## Langkah Kerja Sistem
 
@@ -28,7 +27,6 @@ Sistem berjalan dengan interaksi dinamis antara Perangkat Keras, Awan Data, dan 
 
 3. Web Command Center Dashboard: Aplikasi web statis berkinerja tinggi yang memetakan geolokasi tambak menggunakan Leaflet.js, memvisualisasikan tren data menggunakan Chart.js, dan memproses logika analitik lingkungan secara instan.
 
----
 
 ## 🚀 Fitur Utama Dasbor
 
@@ -42,7 +40,6 @@ Sistem berjalan dengan interaksi dinamis antara Perangkat Keras, Awan Data, dan 
 
 5. Ekspor Laporan Data: Fitur unduh seluruh riwayat telemetri tambak yang masuk ke dalam format berkas .csv secara lokal untuk kebutuhan administrasi atau riset lanjutan.
 
----
 
 ## 📊 Batas Parameter & Logika Mitigasi Lingkungan
 
@@ -52,7 +49,6 @@ Keasaman (pH)	| 7.5 - 8.5 |	Kerusakan Karapas / Racun Amonia |	Instruksi penebar
 Suhu (Temp) |	25.0 - 31.0 °C |	Penurunan Metabolisme / Patogen	| Instruksi pengurangan pakan / penambahan debit air baru.
 Salinitas |	0.0 - 1.0 ppt |	Gangguan Osmoregulasi |	Instruksi pengenceran air dengan menyuplai air tawar.
 
----
 
 ## 🛠️ Teknologi & Pustaka yang Digunakan
 
@@ -78,7 +74,6 @@ Perangkat Keras & Firmware (IoT):
   
   4. time.h - Penanganan waktu lokal waktu Indonesia barat (WIB) melalui NTP (id.pool.ntp.org).
 
----
 
 ## ⚙️ Petunjuk Pemasangan
 
@@ -107,7 +102,6 @@ Perangkat Keras & Firmware (IoT):
         };
     - Simpan perubahan dan jalankan berkas HTML melalui Local Server atau unggah langsung ke GitHub Pages.
 
----
 
 ## 👥 Kontributor & Pengembang
 
