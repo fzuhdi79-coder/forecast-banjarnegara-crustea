@@ -546,7 +546,11 @@ function listenTelemetry() {
   const mm = String(wib.getMonth()+1).padStart(2,'0');
   const dd = String(wib.getDate()).padStart(2,'0');
   let yymmdd = `${wib.getFullYear()}-${mm}-${dd}`;
+  let yymm = `${wib.getFullYear()}-${mm}`;
 
+  let url = `${FB}forecast_2026/${yymm}/${yymmdd}.json?auth=${authToken}&_nocache=${cb}`;
+  let r = await fetch(url, { cache: 'no-store' });
+  
   if (currentTelemetryRef) {
     currentTelemetryRef.off(); // Detach listener lama saat berganti hari
   }
