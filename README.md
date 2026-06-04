@@ -9,14 +9,14 @@
 Sistem ini mengintegrasikan mikrokontroler **ESP32** sebagai pemancar data sensor jarak jauh dengan **Dasbor Web Interaktif** menggunakan **Firebase Realtime Database** sebagai jembatan komunikasi dua arah (*Full-Duplex*).
 
 ## 🛰️ Arsitektur Sistem
-
+```text
 Sistem berjalan dengan interaksi dinamis antara Perangkat Keras, Awan Data, dan Antarmuka Pengguna:
 [ Perangkat ESP32 ] --(HTTP PUT JSON)--> [ Firebase Realtime Database ] <--(Stream Listener)--> [ Dasbor Web User ]
         ^                                               |
         |-------------(Membaca Perintah ON/OFF)---------|
+```
 
-
-## Langkah Kerja Sistem
+## 📋 Langkah Kerja Sistem
 
 1. ESP32 Telemetry Transmitter: Membaca sensor (atau menyimulasikan data berdasarkan model sinusoidal biologis yang presisi), melakukan sinkronisasi waktu milidetik dengan internet melalui NTP Server, lalu mengirimkan payload terstruktur setiap 2 menit menggunakan metode HTTP PUT.
 
