@@ -205,7 +205,7 @@ body {
     <p>Pro Command Center Authentication</p>
     <div class="inp-group">
       <label>Email Pengguna</label>
-      <input type="email" id="inEmail" placeholder="admin@crustea.id" value="admin@crustea.id">
+      <input type="email" id="inEmail" placeholder="Masukkan email Anda">
     </div>
     <div class="inp-group">
       <label>Kata Sandi</label>
@@ -376,7 +376,6 @@ body {
 
 <script>
 // ── KONFIGURASI FIREBASE ──
-// GANTI TEKS DI BAWAH INI DENGAN API KEY FIREBASE MILIK ANDA
 const API_KEY = "AIzaSyDoBiXA94eozZtZr5p6_FYnCBujj1fl8fs"; 
 const FB = "https://forecast-banjarnegara-default-rtdb.asia-southeast1.firebasedatabase.app/";
 
@@ -386,10 +385,8 @@ let expBuf = [];
 let syncCountdown = 120; 
 let currentRelayStatus = "OFF";
 
-// Cek otomatis saat web pertama kali dibuka
 window.addEventListener('load', () => {
   if (authToken) {
-    // Jika ada token tersimpan, langsung masuk ke dashboard
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('appMain').style.display = 'flex';
     startSystem();
@@ -402,22 +399,23 @@ function getWibDate() {
   return new Date(utc + (3600000 * 7));
 }
 
-// ── FUNGSI LOGIN & LOGOUT ──
+// ── FUNGSI LOGIN (SUDAH ANTI SPASI GAIB) ──
 async function doLogin() {
-  // .trim() akan OTOMATIS menghapus spasi gaib di awal/akhir ketikan Anda!
-  const em = document.getElementById('inEmail').value.trim();
-  const pw = document.getElementById('inPass').value.trim();
+  let emRaw = document.getElementById('inEmail').value;
+  let pwRaw = document.getElementById('inPass').value;
+  
+  const em = emRaw.replace(/[^\x20-\x7E]/g, '').trim();
+  const pw = pwRaw.replace(/[^\x20-\x7E]/g, '').trim();
+
   const err = document.getElementById('loginError');
   err.style.display = 'none';
 
-  // 1. Cek jika kosong
   if (!em || !pw) {
     err.textContent = "Email dan sandi wajib diisi.";
     err.style.display = 'block';
     return;
   }
 
-  // 2. Cek apakah formatnya benar-benar email (punya @ dan titik)
   if (!em.includes('@') || !em.includes('.')) {
     err.textContent = "Format salah! Harus alamat email lengkap (contoh: admin@crustea.id)";
     err.style.display = 'block';
@@ -425,7 +423,7 @@ async function doLogin() {
   }
 
   err.style.display = 'block';
-  err.style.color = '#3b82f6'; // Warna biru info
+  err.style.color = '#3b82f6';
   err.textContent = "Memverifikasi ke server...";
 
   const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`;
@@ -438,20 +436,16 @@ async function doLogin() {
     const data = await res.json();
 
     if (data.error) {
-      err.style.color = 'var(--danger)'; // Kembali merah jika gagal
-      // Terjemahkan error Google agar lebih mudah dipahami
+      err.style.color = 'var(--danger)';
       let msg = data.error.message;
       if (msg === "EMAIL_NOT_FOUND") msg = "Email ini belum didaftarkan di Firebase.";
       else if (msg === "INVALID_PASSWORD") msg = "Kata sandi salah.";
       else if (msg === "INVALID_EMAIL") msg = "Format email ditolak oleh server Google.";
       else if (msg === "USER_DISABLED") msg = "Akun ini telah dinonaktifkan.";
-      
       err.textContent = `Gagal: ${msg}`;
     } else {
       authToken = data.idToken;
-      // SIMPAN TOKEN KE MEMORI BROWSER
       localStorage.setItem('crustea_auth_token', authToken);
-      
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('appMain').style.display = 'flex';
       startSystem();
@@ -463,7 +457,6 @@ async function doLogin() {
 }
 
 function doLogout() {
-  // Hapus token dari memori dan muat ulang halaman
   localStorage.removeItem('crustea_auth_token');
   location.reload();
 }
@@ -472,7 +465,7 @@ function doLogout() {
 let map;
 function initMap() {
   if (map) return;
-  const pondLocation = [-7.3970, 109.6972]; // Banjarnegara
+  const pondLocation = [-7.3970, 109.6972]; 
   map = L.map('map').setView(pondLocation, 15);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
     maxZoom: 19, attribution: '© OpenStreetMap'
@@ -525,13 +518,12 @@ function initCharts() {
   mains.Sal = makeChart('chartSal', '#3b82f6', 'Salinitas', 0, 5);
 }
 
-// ── PENARIKAN DATA FIREBASE (DIPERBAIKI) ──
+// ── PENARIKAN DATA FIREBASE ──
 async function fetchStatus() {
   try {
     const cb = new Date().getTime();
     const r = await fetch(`${FB}forecast/status.json?auth=${authToken}&_nocache=${cb}`);
     
-    // Jika token kedaluwarsa (401), otomatis log out
     if (!r.ok && r.status === 401) { doLogout(); return; }
     if (!r.ok) return;
 
@@ -613,16 +605,13 @@ async function fetchTelemetry() {
     let yymmdd = `${wib.getFullYear()}-${mm}-${dd}`;
     const cb = new Date().getTime();
     
-    // Tarik data hari ini
     let url = `${FB}forecast/${yymmdd}.json?auth=${authToken}&_nocache=${cb}`;
     let r = await fetch(url, { cache: 'no-store' });
     
-    // Jika token kedaluwarsa (401), paksa logout
     if (!r.ok && r.status === 401) { doLogout(); return; }
 
     let data = await r.json();
     
-    // DEMO FALLBACK: JIKA HARI INI BELUM ADA DATA, TAMPILKAN DATA AGUSTUS 2024
     if (!data) {
       yymmdd = "2024-08-20"; 
       url = `${FB}forecast/${yymmdd}.json?auth=${authToken}&_nocache=${cb}`;
@@ -632,7 +621,6 @@ async function fetchTelemetry() {
     
     if (!data) return; 
 
-    // Sort numerik
     const keys = Object.keys(data).sort((a, b) => a.localeCompare(b, undefined, {numeric: true})); 
     const recentKeys = keys.slice(-25); 
     
