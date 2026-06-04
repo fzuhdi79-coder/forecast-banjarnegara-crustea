@@ -3,885 +3,676 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crustea EBII · Dashboard</title>
+<title>Crustea EBII · Pro Command Center</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- Firebase SDK v9 (compat) — Auth + RTDB -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
 <style>
-:root{
-  --bg:#f2f5f3;--surface:#fff;--s2:#f8faf9;--s3:#eef2f0;
-  --bdr:#e4ebe7;--bdr2:#d5e0da;
-  --t1:#111c16;--t2:#3b5145;--t3:#6e8c7b;--t4:#a0b8ab;
-  --g:#16a966;--gd:#0e8550;--gbg:rgba(22,169,102,.09);--gbdr:rgba(22,169,102,.22);
-  --am:#c97a12;--ambg:rgba(201,122,18,.09);
-  --ro:#d4294a;--robg:rgba(212,41,74,.09);
-  --bl:#2058c4;--blbg:rgba(32,88,196,.09);
-  --xs:0 1px 2px rgba(0,0,0,.05);
-  --sm:0 1px 4px rgba(0,0,0,.06),0 2px 8px rgba(0,0,0,.04);
-  --md:0 4px 16px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.04);
-  --r:12px;--rsm:8px;--rxs:5px;
-  --f:'DM Sans',sans-serif;--fm:'DM Mono',monospace;
+:root {
+  --bg:        #f2f5f3;
+  --surface:   #ffffff;
+  --surface-2: #f8faf9;
+  --surface-3: #eef2f0;
+  --border:    #e4ebe7;
+  --primary:   #064e3b;
+  --primary-l: #059669;
+  --text:      #1c211f;
+  --text-2:    #4b5563;
+  --danger:    #ef4444;
+  --warning:   #f59e0b;
+  --success:   #10b981;
+  --info:      #3b82f6;
+  --rad:       16px;
+  --rad-sm:    12px;
+  --shadow:    0 4px 20px rgba(0,0,0,0.03);
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{font-size:13px}
-body{background:var(--bg);color:var(--t1);font-family:var(--f);min-height:100vh;-webkit-font-smoothing:antialiased}
 
-/* ─── LOGIN ───────────────────────────────────── */
-#overlay{
-  position:fixed;inset:0;z-index:9999;
-  background:rgba(242,245,243,.92);backdrop-filter:blur(12px);
-  display:flex;align-items:center;justify-content:center;
-  transition:opacity .35s ease;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
-.lcard{
-  background:#fff;border-radius:18px;padding:44px 36px 36px;
-  width:100%;max-width:380px;text-align:center;
-  border:1px solid var(--bdr);box-shadow:0 20px 60px rgba(0,0,0,.09);
+
+.mono { font-family: 'DM Mono', monospace; }
+
+/* -- LOGIN SCREEN -- */
+#loginScreen {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
 }
-.lcard-logo{
-  width:56px;height:56px;background:var(--g);border-radius:14px;
-  display:flex;align-items:center;justify-content:center;
-  color:#fff;font-weight:700;font-size:20px;
-  margin:0 auto 18px;box-shadow:0 4px 16px rgba(22,169,102,.35);
+.login-box {
+  background: var(--surface);
+  width: 100%; max-width: 400px;
+  padding: 2.5rem;
+  border-radius: var(--rad);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  text-align: center;
 }
-.lcard h2{font-size:22px;font-weight:700;letter-spacing:-.3px;margin-bottom:6px}
-.lcard p{font-size:12px;color:var(--t3);margin-bottom:28px}
-.lcard input{
-  width:100%;padding:13px 16px;border:1.5px solid var(--bdr);
-  border-radius:9px;margin-bottom:10px;font-family:var(--f);
-  font-size:13px;outline:none;transition:border .2s,box-shadow .2s;
-  background:var(--s2);color:var(--t1);
+.login-box h1 { margin-bottom: 0.5rem; color: var(--primary); font-size: 1.5rem;}
+.login-box p { color: var(--text-2); margin-bottom: 2rem; font-size: 0.9rem;}
+.inp-group { margin-bottom: 1.5rem; text-align: left; }
+.inp-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-2); margin-bottom: 0.5rem;}
+.inp-group input {
+  width: 100%; padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--rad-sm);
+  font-family: inherit; font-size: 1rem;
+  transition: all 0.2s;
+  background: var(--surface-2);
 }
-.lcard input:focus{border-color:var(--g);box-shadow:0 0 0 3px var(--gbg);background:#fff}
-.lcard input::placeholder{color:var(--t4)}
-.err-msg{color:var(--ro);font-size:11px;font-weight:600;margin-bottom:10px;display:none;padding:8px 12px;background:var(--robg);border-radius:6px}
-.login-btn{
-  width:100%;background:var(--g);color:#fff;border:none;
-  padding:14px;border-radius:9px;font-weight:600;cursor:pointer;
-  font-family:var(--f);font-size:13px;transition:background .2s,transform .1s;
-  box-shadow:0 4px 12px rgba(22,169,102,.3);
+.inp-group input:focus { outline: none; border-color: var(--primary-l); background: var(--surface); box-shadow: 0 0 0 3px rgba(5,150,105,0.1); }
+.btn-login {
+  width: 100%; padding: 0.85rem;
+  background: var(--primary); color: white;
+  border: none; border-radius: var(--rad-sm);
+  font-weight: 600; font-size: 1rem; cursor: pointer;
+  transition: background 0.2s;
 }
-.login-btn:hover{background:var(--gd);transform:translateY(-1px)}
-.login-btn:active{transform:translateY(0)}
-.login-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
-.lcard-foot{margin-top:20px;font-size:10px;color:var(--t4);font-family:var(--fm)}
+.btn-login:hover { background: var(--primary-l); }
+#loginError { color: var(--danger); font-size: 0.85rem; margin-top: 1rem; display: none; }
 
-/* ─── TOPBAR ──────────────────────────────────── */
-.topbar{
-  background:#fff;border-bottom:1px solid var(--bdr);
-  height:56px;padding:0 28px;
-  display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:50;box-shadow:var(--xs);
+/* -- LAYOUT MAIN -- */
+#appMain {
+  display: flex; min-height: 100vh;
 }
-.tb-brand{display:flex;align-items:center;gap:12px}
-.tb-logo{
-  width:30px;height:30px;border-radius:8px;background:var(--g);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--fm);font-size:9px;font-weight:600;
-  color:#fff;letter-spacing:.5px;box-shadow:0 2px 8px rgba(22,169,102,.3);flex-shrink:0
+.sidebar {
+  width: 280px; background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  position: sticky; top: 0; height: 100vh;
+  z-index: 50;
 }
-.tb-title{font-size:14px;font-weight:600;color:var(--t1)}
-.tb-sep{width:1px;height:18px;background:var(--bdr)}
-.tb-loc{font-size:11px;font-weight:500;color:var(--t3);background:var(--s3);padding:4px 10px;border-radius:6px}
-.tb-right{display:flex;align-items:center;gap:8px}
-.chip{font-size:10px;font-weight:600;padding:5px 11px;border-radius:20px;border:1px solid var(--bdr);background:var(--s2);color:var(--t3);white-space:nowrap;display:flex;align-items:center;gap:5px}
-.chip-am{background:var(--ambg);border-color:rgba(201,122,18,.22);color:var(--am)}
-.chip-bl{background:var(--blbg);border-color:rgba(32,88,196,.22);color:var(--bl);font-family:var(--fm)}
-.chip-gr{background:var(--gbg);border-color:var(--gbdr);color:var(--g)}
-.btn{font-family:var(--f);font-size:11px;font-weight:600;padding:6px 13px;border-radius:var(--rsm);border:1px solid var(--bdr);background:#fff;color:var(--t2);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
-.btn:hover{background:var(--s3);border-color:var(--bdr2)}
-.btn-g{background:var(--g);color:#fff;border-color:var(--g);box-shadow:0 2px 8px rgba(22,169,102,.25)}
-.btn-g:hover{background:var(--gd);border-color:var(--gd)}
-.btn-sys{min-width:108px;justify-content:center}
-.btn-sys.on{background:var(--g);color:#fff;border-color:var(--g);box-shadow:0 2px 8px rgba(22,169,102,.25)}
-.btn-sys.off{color:var(--t4)}
-.user-chip{display:flex;align-items:center;gap:7px;padding:4px 10px 4px 6px;border-radius:20px;background:var(--s3);border:1px solid var(--bdr);cursor:pointer;transition:background .15s}
-.user-chip:hover{background:var(--s2)}
-.user-av{width:22px;height:22px;border-radius:50%;background:var(--g);display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:700;flex-shrink:0}
-.user-name{font-size:10px;font-weight:600;color:var(--t2)}
-.live-dot{width:7px;height:7px;border-radius:50%;background:var(--g);box-shadow:0 0 6px rgba(22,169,102,.6);flex-shrink:0;animation:blink 2s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-
-/* ─── PAGE ────────────────────────────────────── */
-.page{max-width:1400px;margin:0 auto;padding:22px 28px 40px}
-
-/* ─── SECTION DIVIDER ─────────────────────────── */
-.sec{display:flex;align-items:center;gap:10px;margin:22px 0 12px}
-.sec span{font-size:10px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.9px;white-space:nowrap}
-.sec hr{flex:1;height:1px;border:none;background:var(--bdr)}
-
-/* ─── OVERVIEW ROW ────────────────────────────── */
-.ov-row{display:grid;grid-template-columns:200px 290px 1fr;gap:14px;margin-bottom:14px}
-
-.weather-cell{
-  background:linear-gradient(150deg,#0b7a4f 0%,#16a966 100%);
-  border-radius:var(--r);padding:20px;color:#fff;
-  position:relative;overflow:hidden;
-  box-shadow:0 4px 20px rgba(22,169,102,.28);
-  display:flex;flex-direction:column;
+.sb-head { padding: 1.5rem; border-bottom: 1px solid var(--border); }
+.sb-head h1 { font-size: 1.25rem; font-weight: 700; color: var(--primary); letter-spacing: -0.5px;}
+.sb-nav { padding: 1.5rem; flex: 1; overflow-y: auto;}
+.nav-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  color: var(--text-2); font-weight: 500;
+  border-radius: var(--rad-sm); text-decoration: none;
+  margin-bottom: 0.5rem; transition: all 0.2s;
 }
-.weather-cell::before{content:'';position:absolute;top:-28px;right:-28px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.07)}
-.wc-loc{font-size:9px;font-weight:600;opacity:.75;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:4px}
-.wc-t{font-size:46px;font-weight:300;line-height:1;margin-bottom:2px;letter-spacing:-1px}
-.wc-d{font-size:11px;opacity:.8;margin-bottom:12px}
-.wc-row{display:flex;gap:12px;font-size:10px;opacity:.65;font-family:var(--fm)}
-.wc-date{font-size:9px;font-family:var(--fm);opacity:.55;margin-top:auto;padding-top:10px;border-top:1px solid rgba(255,255,255,.18)}
+.nav-item:hover, .nav-item.active {
+  background: var(--surface-3); color: var(--primary);
+}
+.sb-foot { padding: 1.5rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--text-2); }
 
-.map-cell{background:#fff;border:1px solid var(--bdr);border-radius:var(--r);padding:4px;box-shadow:var(--xs);position:relative;overflow:hidden;min-height:180px}
-#pondMap{width:100%;height:100%;border-radius:9px;z-index:1}
-.leaflet-control-zoom{border:none!important;box-shadow:var(--sm)!important}
+.content {
+  flex: 1; padding: 2rem; max-width: 1400px; margin: 0 auto;
+}
 
-.meta-grid{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);gap:14px}
-.meta-card{background:#fff;border:1px solid var(--bdr);border-radius:var(--r);padding:14px 16px;box-shadow:var(--xs);display:flex;flex-direction:column;justify-content:center}
-.mc-l{font-size:9px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px}
-.mc-v{font-size:16px;font-weight:600;color:var(--t1);line-height:1.2}
-.mc-s{font-size:10px;color:var(--t4);margin-top:2px;font-family:var(--fm)}
+/* -- HEADER TOP -- */
+.top-bar {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 2rem;
+}
+.top-title h2 { font-size: 1.75rem; font-weight: 700; color: var(--text); letter-spacing: -0.5px;}
+.top-title p { color: var(--text-2); margin-top: 0.25rem;}
+.top-actions { display: flex; gap: 1rem; align-items: center; }
 
-/* ─── PARAM CARDS ─────────────────────────────── */
-.param-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
-.param-card{background:#fff;border:1px solid var(--bdr);border-radius:var(--r);padding:18px 20px 14px;box-shadow:var(--xs);transition:box-shadow .2s,transform .2s;position:relative;overflow:hidden}
-.param-card:hover{box-shadow:var(--md);transform:translateY(-2px)}
-.param-card.is-crit{border-color:rgba(212,41,74,.35);background:linear-gradient(135deg,#fff 80%,rgba(212,41,74,.03))}
-.param-card.is-warn{border-color:rgba(201,122,18,.35)}
-.pc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.pc-name{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
-.badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px}
-.b-ok{background:var(--gbg);color:var(--g);border:1px solid var(--gbdr)}
-.b-warn{background:var(--ambg);color:var(--am);border:1px solid rgba(201,122,18,.25);animation:blink 1.5s infinite}
-.b-crit{background:var(--robg);color:var(--ro);border:1px solid rgba(212,41,74,.25);animation:blink .8s infinite}
-.b-init{background:var(--s3);color:var(--t4);border:1px solid var(--bdr)}
-.pc-num{font-size:38px;font-weight:300;line-height:1;letter-spacing:-1px}
-.pc-unit{font-size:11px;color:var(--t4);margin-top:2px;font-weight:500}
-.pc-rng{font-size:9px;color:var(--t4);font-family:var(--fm);margin-top:3px}
-.pc-spark{height:38px;margin-top:12px}
-.pc-spark canvas{width:100%!important;height:38px!important}
-.a-g .pc-num{color:var(--g)}
-.a-am .pc-num{color:var(--am)}
-.a-ro .pc-num{color:var(--ro)}
-.a-bl .pc-num{color:var(--bl)}
+.status-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 1rem; border-radius: 99px;
+  background: var(--surface); border: 1px solid var(--border);
+  font-weight: 600; font-size: 0.85rem; box-shadow: var(--shadow);
+}
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.dot.on { background: var(--success); box-shadow: 0 0 8px var(--success); animation: pulse 2s infinite;}
+.dot.off { background: var(--danger); }
 
-/* ─── ALERT BANNER ────────────────────────────── */
-.banner{border-radius:var(--r);padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;border:1px solid;transition:all .3s;box-shadow:var(--xs)}
-.bn-ok{background:var(--gbg);border-color:var(--gbdr)}
-.bn-crit{background:var(--robg);border-color:rgba(212,41,74,.25)}
-.bn-l{display:flex;align-items:center;gap:12px}
-.bn-ico{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
-.bi-ok{background:var(--g);color:#fff}
-.bi-crit{background:var(--ro);color:#fff}
-.bn-title{font-size:12px;font-weight:600;color:var(--t1);margin-bottom:1px}
-.bn-desc{font-size:10px;color:var(--t2)}
-.bn-chip{font-size:9px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.btn {
+  padding: 0.5rem 1rem; border-radius: var(--rad-sm);
+  font-weight: 600; font-size: 0.85rem; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  transition: all 0.2s; box-shadow: var(--shadow);
+}
+.btn:hover { background: var(--surface-3); }
+.btn-green { background: var(--success); color: white; border-color: var(--success); }
+.btn-green:hover { background: #0ea5e9; border-color: #0ea5e9; }
 
-/* ─── MAIN GRID (CHARTS + LOG) ────────────────── */
-.main-grid{display:grid;grid-template-columns:1fr 1fr 330px;gap:14px;margin-bottom:14px}
-.chart-card{background:#fff;border:1px solid var(--bdr);border-radius:var(--r);padding:16px 18px;box-shadow:var(--xs);display:flex;flex-direction:column;overflow:hidden}
-.cc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-shrink:0}
-.cc-title{font-size:11px;font-weight:600;color:var(--t1)}
-.cc-tag{font-size:9px;font-family:var(--fm);color:var(--t4);background:var(--s3);padding:3px 8px;border-radius:4px;border:1px solid var(--bdr)}
-.chart-wrap{flex:1;width:100%;height:150px;overflow-x:auto;overflow-y:hidden;scroll-behavior:smooth}
-.chart-wrap::-webkit-scrollbar{height:4px}
-.chart-wrap::-webkit-scrollbar-thumb{background:var(--t4);border-radius:2px}
-.chart-wrap::-webkit-scrollbar-track{background:var(--s3);border-radius:2px}
-.chart-inner{height:100%;min-width:100%;position:relative;transition:width .2s ease}
+/* -- GRID CARDS -- */
+.grid-overview {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem; margin-bottom: 2rem;
+}
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--rad); padding: 1.5rem;
+  box-shadow: var(--shadow);
+}
+.card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;}
+.card-head h3 { font-size: 0.9rem; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.5px;}
+.val-wrap { display: flex; align-items: baseline; gap: 0.5rem;}
+.val { font-size: 2.25rem; font-weight: 700; color: var(--primary); letter-spacing: -1px;}
+.unit { font-size: 1rem; color: var(--text-2); font-weight: 500;}
 
-/* log */
-.log-card{background:#fff;border:1px solid var(--bdr);border-radius:var(--r);box-shadow:var(--xs);display:flex;flex-direction:column;grid-row:span 2}
-.log-head{padding:14px 18px 12px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px;background:var(--s2);border-radius:var(--r) var(--r) 0 0}
-.log-title{font-size:11px;font-weight:600;color:var(--t1);flex:1}
-.log-cnt{font-size:9px;font-family:var(--fm);background:var(--s3);padding:2px 7px;border-radius:4px;border:1px solid var(--bdr);color:var(--t4)}
-.log-body{flex:1;overflow-y:auto;padding:6px 0;max-height:420px}
-.log-body::-webkit-scrollbar{width:3px}
-.log-body::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
-.log-entry{display:flex;align-items:flex-start;gap:9px;padding:7px 18px;transition:background .1s;animation:fu .2s ease;border-bottom:1px solid rgba(0,0,0,.02)}
-@keyframes fu{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
-.log-entry:hover{background:var(--s2)}
-.log-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:3px}
-.ld-ok{background:var(--g);box-shadow:0 0 0 2px var(--gbg)}
-.ld-crit{background:var(--ro);box-shadow:0 0 0 2px var(--robg)}
-.ld-warn{background:var(--am);box-shadow:0 0 0 2px var(--ambg)}
-.ld-info{background:var(--bl);box-shadow:0 0 0 2px var(--blbg)}
-.log-bi{flex:1}
-.log-t{font-size:9px;font-family:var(--fm);color:var(--t4);margin-bottom:1px}
-.log-m{font-size:10px;color:var(--t2);line-height:1.5;font-weight:500}
-.log-m.ok{color:var(--gd)}
-.log-m.crit{color:var(--ro)}
-.log-m.warn{color:var(--am)}
-.log-m.info{color:var(--bl)}
+/* -- CHART GRID -- */
+.grid-charts {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem; margin-bottom: 2rem;
+}
 
-/* ─── BOTTOM ROW ──────────────────────────────── */
-.bot-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.card{background:#fff;border:1px solid var(--bdr);border-radius:var(--r);box-shadow:var(--xs)}
-.card-head{padding:14px 18px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;background:var(--s2);border-radius:var(--r) var(--r) 0 0}
-.card-title{font-size:11px;font-weight:600;color:var(--t1)}
-.card-sub{font-size:9px;font-family:var(--fm);color:var(--t4)}
-.card-body{padding:14px 18px}
+/* Kontainer Chart Responsif standar */
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+  padding: 1rem;
+}
 
-/* AI box */
-.ai-box{background:#fff;border:1px solid var(--bdr);border-radius:var(--rsm);padding:12px;margin-bottom:10px;display:flex;gap:10px;align-items:flex-start;box-shadow:var(--xs)}
-.ai-box:last-child{margin-bottom:0;background:var(--s3);border-color:transparent;box-shadow:none}
-.aib-icon{font-size:15px;flex-shrink:0;margin-top:1px}
-.aib-label{font-size:9px;font-weight:700;color:var(--bl);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
-.aib-text{font-size:10px;color:var(--t2);line-height:1.55}
+.map-container { height: 350px; border-radius: var(--rad-sm); overflow: hidden; z-index: 10; border: 1px solid var(--border); }
 
-/* target gauge */
-.t-row{display:grid;grid-template-columns:80px 1fr 90px 70px;gap:10px;padding:9px 12px;border-radius:var(--rsm);align-items:center;border:1px solid var(--bdr);background:var(--s2);margin-bottom:8px;transition:background .15s}
-.t-row:hover{background:var(--s3)}
-.t-row:last-child{margin-bottom:0}
-.t-label{font-size:11px;font-weight:600;color:var(--t2);display:flex;align-items:center;gap:6px}
-.t-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.t-track{position:relative;height:6px;background:var(--bdr);border-radius:3px}
-.t-zone{position:absolute;height:100%;border-radius:3px;opacity:.35}
-.t-marker{position:absolute;width:4px;height:14px;top:-4px;border-radius:2px;background:var(--t1);transition:left .5s cubic-bezier(.4,0,.2,1);box-shadow:0 0 0 2px var(--s2);z-index:2}
-.t-info{display:flex;flex-direction:column;align-items:flex-end}
-.t-val{font-size:12px;font-family:var(--fm);color:var(--t1);font-weight:600;line-height:1}
-.t-rng{font-size:9px;font-family:var(--fm);color:var(--t4);margin-top:3px}
+.ai-box {
+  background: linear-gradient(135deg, #064e3b 0%, #059669 100%);
+  color: white; border-radius: var(--rad); padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(5,150,105,0.2);
+  margin-bottom: 2rem;
+}
+.ai-box h3 { font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+.ai-box p { font-size: 0.95rem; opacity: 0.9; line-height: 1.6; }
 
-/* ─── FOOTER ──────────────────────────────────── */
-.footer{padding:16px 28px;font-size:10px;color:var(--t4);font-family:var(--fm);display:flex;justify-content:space-between;border-top:1px solid var(--bdr);margin-top:8px}
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+@media (max-width: 1024px) {
+  .grid-charts { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  #appMain { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border);}
+  .sb-nav { display: none; } 
+  .top-bar { flex-direction: column; gap: 1rem; }
+}
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════ LOGIN OVERLAY ═══════════════════════════ -->
-<div id="overlay">
-  <div class="lcard">
-    <div class="lcard-logo">EB</div>
-    <h2>Crustea EBII Pro</h2>
-    <p>Autentikasi Firebase diperlukan untuk mengakses dashboard.</p>
-    <input type="email" id="loginEmail" placeholder="Email administrator..." autocomplete="email">
-    <input type="password" id="loginPw" placeholder="Kata sandi..." onkeydown="if(event.key==='Enter')doLogin()">
-    <div class="err-msg" id="errMsg"></div>
-    <button class="login-btn" id="btnLogin" onclick="doLogin()">Masuk ke Command Center</button>
-    <div class="lcard-foot">🔒 Sistem diamankan dengan Firebase Authentication</div>
+<div id="loginScreen">
+  <div class="login-box">
+    <h1>Crustea EBII</h1>
+    <p>Pro Command Center Authentication</p>
+    <div class="inp-group">
+      <label>Email Pengguna</label>
+      <input type="email" id="inEmail" placeholder="admin@crustea.id" value="admin@crustea.id">
+    </div>
+    <div class="inp-group">
+      <label>Kata Sandi</label>
+      <input type="password" id="inPass" placeholder="••••••••">
+    </div>
+    <button class="btn-login" onclick="doLogin()">Autentikasi Sistem</button>
+    <div id="loginError">Autentikasi Gagal. Periksa kembali kredensial Anda.</div>
   </div>
 </div>
 
-<!-- ═══════════════════════════ TOPBAR ══════════════════════════════════ -->
-<header class="topbar">
-  <div class="tb-brand">
-    <div class="tb-logo">EB</div>
-    <span class="tb-title">Crustea Monitoring</span>
-    <div class="tb-sep"></div>
-    <span class="tb-loc">Kolam A-01 · Lembah Serayu</span>
-  </div>
-  <div class="tb-right">
-    <span class="chip chip-bl" id="syncTimer">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      Next Sync: 02:00
-    </span>
-    <div class="live-dot"></div>
-    <span class="chip chip-am">☀ Kemarau · Jun 2026</span>
-    <span class="chip" id="liveClock" style="font-family:var(--fm)">00:00:00</span>
-    <button class="btn btn-g" onclick="downloadCSV()">⬇ Export CSV</button>
-    <button class="btn btn-sys off" id="btnToggle" onclick="toggleStatus()">Memuat...</button>
-    <div class="user-chip" onclick="doLogout()" title="Klik untuk logout">
-      <div class="user-av" id="userAv">—</div>
-      <span class="user-name" id="userName">—</span>
+<div id="appMain" style="display: none;">
+  <aside class="sidebar">
+    <div class="sb-head">
+      <h1>Crustea EBII</h1>
     </div>
-  </div>
-</header>
+    <nav class="sb-nav">
+      <a href="#" class="nav-item active">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+        Dashboard
+      </a>
+      <a href="#" class="nav-item" onclick="toggleRelay()">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+        <span id="relayText">Sistem Halted (OFF)</span>
+      </a>
+      <a href="#" class="nav-item" onclick="downloadCSV()">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        Ekspor Data (CSV)
+      </a>
+    </nav>
+    <div class="sb-foot">
+      <div id="syncTimer" class="mono" style="margin-bottom:4px; font-weight:600; color:var(--primary)">Next Sync: --:--</div>
+      <div id="liveClock" class="mono">--:--:-- WIB</div>
+      <div style="margin-top: 8px;">v2.5.0-pro (Stable)</div>
+    </div>
+  </aside>
 
-<!-- ═══════════════════════════ PAGE ════════════════════════════════════ -->
-<div class="page">
-
-  <!-- OVERVIEW -->
-  <div class="ov-row">
-    <div class="weather-cell">
-      <div class="wc-loc">📍 Banjarnegara, ID</div>
-      <div class="wc-t" id="ambTemp">28°C</div>
-      <div class="wc-d">Cerah Berawan — Kemarau Aktif</div>
-      <div class="wc-row"><span>H: 32°C</span><span>L: 22°C</span><span>Rh: 68%</span></div>
-      <div class="wc-date" id="wDate">—</div>
-    </div>
-
-    <div class="map-cell">
-      <div id="pondMap"></div>
-    </div>
-
-    <div class="meta-grid">
-      <div class="meta-card"><div class="mc-l">Sistem</div><div class="mc-v">Inland · Tawar</div><div class="mc-s">Low-Salinity</div></div>
-      <div class="meta-card"><div class="mc-l">Elevasi</div><div class="mc-v">±150 mdpl</div><div class="mc-s">Lembah Serayu</div></div>
-      <div class="meta-card"><div class="mc-l">Komoditas</div><div class="mc-v">Vaname</div><div class="mc-s">DOC 35 Hari</div></div>
-      <div class="meta-card"><div class="mc-l">Terakhir Sync</div><div class="mc-v" id="lastSync" style="font-size:13px;font-family:var(--fm)">—</div><div class="mc-s">Firebase Realtime DB</div></div>
-    </div>
-  </div>
-
-  <!-- PARAMS -->
-  <div class="sec"><span>Parameter Aktual Kolam</span><hr></div>
-  <div class="param-grid">
-    <div class="param-card a-g" id="card_DO">
-      <div class="pc-head"><span class="pc-name">Dissolved Oxygen</span><span class="badge b-init" id="badge_DO">—</span></div>
-      <div class="pc-num" id="val_DO">—</div>
-      <div class="pc-unit">mg/L</div>
-      <div class="pc-rng">Optimal 4.5 – 8.0 mg/L</div>
-      <div class="pc-spark"><canvas id="sp_DO"></canvas></div>
-    </div>
-    <div class="param-card a-am" id="card_pH">
-      <div class="pc-head"><span class="pc-name">Tingkat pH Air</span><span class="badge b-init" id="badge_pH">—</span></div>
-      <div class="pc-num" id="val_pH">—</div>
-      <div class="pc-unit">pH unit</div>
-      <div class="pc-rng">Optimal 7.5 – 8.5</div>
-      <div class="pc-spark"><canvas id="sp_pH"></canvas></div>
-    </div>
-    <div class="param-card a-ro" id="card_Suhu">
-      <div class="pc-head"><span class="pc-name">Suhu Termal Air</span><span class="badge b-init" id="badge_Suhu">—</span></div>
-      <div class="pc-num" id="val_Suhu">—</div>
-      <div class="pc-unit">°C</div>
-      <div class="pc-rng">Optimal 25.0 – 31.0 °C</div>
-      <div class="pc-spark"><canvas id="sp_Suhu"></canvas></div>
-    </div>
-    <div class="param-card a-bl" id="card_Sal">
-      <div class="pc-head"><span class="pc-name">Kadar Salinitas</span><span class="badge b-init" id="badge_Sal">—</span></div>
-      <div class="pc-num" id="val_Sal">—</div>
-      <div class="pc-unit">ppt</div>
-      <div class="pc-rng">Optimal 0.0 – 1.0 ppt</div>
-      <div class="pc-spark"><canvas id="sp_Sal"></canvas></div>
-    </div>
-  </div>
-
-  <!-- ALERT -->
-  <div class="banner bn-ok" id="alertBanner">
-    <div class="bn-l">
-      <div class="bn-ico bi-ok" id="abIco">✓</div>
-      <div>
-        <div class="bn-title" id="abTitle">Semua parameter dalam batas aman</div>
-        <div class="bn-desc" id="abDesc">Ekosistem kolam tawar Vaname berjalan optimal. Pertahankan prosedur budidaya harian.</div>
+  <main class="content">
+    <div class="top-bar">
+      <div class="top-title">
+        <h2>Pemantauan Kualitas Air</h2>
+        <p>Lokasi Tambak: <strong id="locName">Mengambil satelit...</strong></p>
       </div>
-    </div>
-    <span class="bn-chip" id="abChip" style="border-color:var(--gbdr);color:var(--g);background:var(--gbg)">SOP Terjaga</span>
-  </div>
-
-  <!-- CHARTS + LOG -->
-  <div class="sec"><span>Grafik Tren Historis (Update: 2 Menit — Geser ke Samping)</span><hr></div>
-  <div class="main-grid">
-    <div class="chart-card">
-      <div class="cc-head"><span class="cc-title">Oksigen Terlarut (mg/L)</span><span class="cc-tag">Optimal 4.5 – 8.0</span></div>
-      <div class="chart-wrap" id="wrap_DO"><div class="chart-inner" id="inner_DO"><canvas id="chartDO"></canvas></div></div>
-    </div>
-    <div class="chart-card">
-      <div class="cc-head"><span class="cc-title">Fluktuasi pH Air</span><span class="cc-tag">Optimal 7.5 – 8.5</span></div>
-      <div class="chart-wrap" id="wrap_PH"><div class="chart-inner" id="inner_PH"><canvas id="chartPH"></canvas></div></div>
-    </div>
-    <div class="log-card">
-      <div class="log-head">
-        <div class="live-dot" style="box-shadow:none"></div>
-        <span class="log-title">Log Kejadian Otomatis</span>
-        <span class="log-cnt" id="logCnt">0</span>
-      </div>
-      <div class="log-body" id="logBody">
-        <div data-init style="padding:24px 16px;font-size:10px;color:var(--t4);font-family:var(--fm);text-align:center">› Menunggu data ESP32...</div>
-      </div>
-    </div>
-    <div class="chart-card">
-      <div class="cc-head"><span class="cc-title">Suhu Termal Air (°C)</span><span class="cc-tag">Optimal 25 – 31</span></div>
-      <div class="chart-wrap" id="wrap_Suhu"><div class="chart-inner" id="inner_Suhu"><canvas id="chartSuhu"></canvas></div></div>
-    </div>
-    <div class="chart-card">
-      <div class="cc-head"><span class="cc-title">Kadar Salinitas (ppt)</span><span class="cc-tag">Optimal 0.0 – 1.0</span></div>
-      <div class="chart-wrap" id="wrap_Sal"><div class="chart-inner" id="inner_Sal"><canvas id="chartSal"></canvas></div></div>
-    </div>
-  </div>
-
-  <!-- INSIGHTS + TARGET -->
-  <div class="sec"><span>Operational &amp; AI Insights</span><hr></div>
-  <div class="bot-grid">
-    <div class="card">
-      <div class="card-head"><span class="card-title">💡 Panduan AI Operasional (Tren 2 Menit)</span><span class="card-sub">Real-time evaluasi</span></div>
-      <div class="card-body">
-        <div class="ai-box">
-          <div class="aib-icon">📊</div>
-          <div><div class="aib-label">Analisis Tren Ekosistem</div><div class="aib-text" id="aiInsight">Mengumpulkan pembacaan sensor pertama...</div></div>
+      <div class="top-actions">
+        <div class="status-badge">
+          <div id="hwDot" class="dot off"></div>
+          <span id="hwStatus">Menghubungkan...</span>
         </div>
-        <div class="ai-box" style="margin-bottom:0">
-          <div class="aib-icon">⚙️</div>
-          <div><div class="aib-label" style="color:var(--t3)">Rekomendasi Tindakan</div><div class="aib-text" id="aiAction">Sistem berjalan otomatis. Belum ada intervensi manual yang disarankan.</div></div>
+        <button class="btn btn-green" onclick="fetchTelemetry()">
+          <svg style="display:inline; vertical-align:middle; margin-right:4px;" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          Sync Manual
+        </button>
+      </div>
+    </div>
+
+    <div class="ai-box">
+      <h3>
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        Analisis Pakar Instan
+      </h3>
+      <p id="aiInsight">Menunggu data masuk untuk dianalisis...</p>
+    </div>
+
+    <div class="grid-overview">
+      <div class="card">
+        <div class="card-head">
+          <h3>Oksigen (DO)</h3>
+          <span style="color:var(--info)"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg></span>
+        </div>
+        <div class="val-wrap">
+          <div class="val" id="rtDO">--</div>
+          <div class="unit">mg/L</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3>Tingkat pH</h3>
+          <span style="color:var(--warning)"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg></span>
+        </div>
+        <div class="val-wrap">
+          <div class="val" id="rtPH">--</div>
+          <div class="unit">pH</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3>Suhu Air</h3>
+          <span style="color:var(--danger)"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg></span>
+        </div>
+        <div class="val-wrap">
+          <div class="val" id="rtSU">--</div>
+          <div class="unit">°C</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3>Salinitas</h3>
+          <span style="color:var(--primary)"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg></span>
+        </div>
+        <div class="val-wrap">
+          <div class="val" id="rtSA">--</div>
+          <div class="unit">ppt</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-charts">
+      <div class="card p-0" style="padding:0; overflow:hidden;">
+        <div style="padding:1.5rem; border-bottom:1px solid var(--border);">
+          <h3 style="font-weight:600; color:var(--text);">Oksigen Terlarut (DO)</h3>
+          <p style="font-size:0.85rem; color:var(--text-2);">Target: > 4.5 mg/L | Ideal: 5 - 7 mg/L</p>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartDO"></canvas>
+        </div>
+      </div>
+      <div class="card p-0" style="padding:0; overflow:hidden;">
+        <div style="padding:1.5rem; border-bottom:1px solid var(--border);">
+          <h3 style="font-weight:600; color:var(--text);">Tingkat Keasaman (pH)</h3>
+          <p style="font-size:0.85rem; color:var(--text-2);">Target: 7.5 - 8.5</p>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartPH"></canvas>
+        </div>
+      </div>
+      <div class="card p-0" style="padding:0; overflow:hidden;">
+        <div style="padding:1.5rem; border-bottom:1px solid var(--border);">
+          <h3 style="font-weight:600; color:var(--text);">Suhu Air (Temp)</h3>
+          <p style="font-size:0.85rem; color:var(--text-2);">Target: 25 - 31 °C</p>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartSuhu"></canvas>
+        </div>
+      </div>
+      <div class="card p-0" style="padding:0; overflow:hidden;">
+        <div style="padding:1.5rem; border-bottom:1px solid var(--border);">
+          <h3 style="font-weight:600; color:var(--text);">Salinitas</h3>
+          <p style="font-size:0.85rem; color:var(--text-2);">Target: 0 - 1.0 ppt (Air Tawar/Payau)</p>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartSal"></canvas>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-head"><span class="card-title">Kepatuhan Terhadap SOP (Target Range)</span><span class="card-sub">Posisi Aktual vs Optimal</span></div>
-      <div class="card-body">
-        <div class="t-row">
-          <div class="t-label"><span class="t-dot" style="background:var(--g)"></span>DO</div>
-          <div class="t-track"><div class="t-zone" id="tz_DO" style="background:var(--g)"></div><div class="t-marker" id="tm_DO" style="left:0%"></div></div>
-          <div class="t-info"><div class="t-val" id="tv_DO">—</div><div class="t-rng">4.5–8.0 mg/L</div></div>
-          <div><span class="badge b-init" id="tbg_DO">—</span></div>
+      <div class="card-head">
+        <h3>Lokasi & Cuaca Terkini</h3>
+      </div>
+      <div style="display:flex; gap:2rem; flex-wrap:wrap; margin-bottom:1.5rem;">
+        <div>
+          <div style="font-size:0.85rem; color:var(--text-2);">Kondisi Cuaca WIB</div>
+          <div style="font-size:1.25rem; font-weight:600; color:var(--text);" id="wDate">--</div>
         </div>
-        <div class="t-row">
-          <div class="t-label"><span class="t-dot" style="background:var(--am)"></span>pH</div>
-          <div class="t-track"><div class="t-zone" id="tz_pH" style="background:var(--am)"></div><div class="t-marker" id="tm_pH" style="left:0%"></div></div>
-          <div class="t-info"><div class="t-val" id="tv_pH">—</div><div class="t-rng">7.5–8.5</div></div>
-          <div><span class="badge b-init" id="tbg_pH">—</span></div>
-        </div>
-        <div class="t-row">
-          <div class="t-label"><span class="t-dot" style="background:var(--ro)"></span>Suhu</div>
-          <div class="t-track"><div class="t-zone" id="tz_Suhu" style="background:var(--ro)"></div><div class="t-marker" id="tm_Suhu" style="left:0%"></div></div>
-          <div class="t-info"><div class="t-val" id="tv_Suhu">—</div><div class="t-rng">25–31 °C</div></div>
-          <div><span class="badge b-init" id="tbg_Suhu">—</span></div>
-        </div>
-        <div class="t-row">
-          <div class="t-label"><span class="t-dot" style="background:var(--bl)"></span>Salinitas</div>
-          <div class="t-track"><div class="t-zone" id="tz_Sal" style="background:var(--bl)"></div><div class="t-marker" id="tm_Sal" style="left:0%"></div></div>
-          <div class="t-info"><div class="t-val" id="tv_Sal">—</div><div class="t-rng">0.0–1.0 ppt</div></div>
-          <div><span class="badge b-init" id="tbg_Sal">—</span></div>
+        <div>
+          <div style="font-size:0.85rem; color:var(--text-2);">Suhu Ambien Darat</div>
+          <div style="font-size:1.25rem; font-weight:600; color:var(--text);" id="ambTemp">--</div>
         </div>
       </div>
+      <div id="map" class="map-container"></div>
     </div>
-  </div>
-
-  <div class="footer">
-    <span>Crustea EBII System v2.7 · Firebase asia-southeast1 · ESP32 interval 2 menit</span>
-    <span>7°23'S 109°41'E · Kab. Banjarnegara, Jawa Tengah</span>
-  </div>
+  </main>
 </div>
 
-<!-- ═══════════════════════════ SCRIPTS ═════════════════════════════════ -->
 <script>
-// ══════════════════════════════════════════════════════════════════
-// FIREBASE CONFIG — SATU SUMBER KEBENARAN
-// Cocokkan dengan project: forecast-banjarnegara
-// ══════════════════════════════════════════════════════════════════
-const FB_CONFIG = {
-  apiKey:            "AIzaSyDoBiXA94eozZtZr5p6_FYnCBujj1fl8fs",
-  authDomain:        "forecast-banjarnegara.firebaseapp.com",
-  databaseURL:       "https://forecast-banjarnegara-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId:         "forecast-banjarnegara",
-  storageBucket:     "forecast-banjarnegara.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",   // optional untuk web-only
-  appId:             "YOUR_APP_ID"       // optional untuk web-only
-};
+// ── KONFIGURASI FIREBASE ──
+// GANTI TEKS DI BAWAH INI DENGAN API KEY FIREBASE MILIK ANDA
+const API_KEY = "AIzaSyDoBiXA94eozZtZr5p6_FYnCBujj1fl8fs"; 
 
-firebase.initializeApp(FB_CONFIG);
-const fbAuth = firebase.auth();
-const FB_URL = FB_CONFIG.databaseURL + "/";
+// INI ADALAH DATABASE ASLI ANDA, JANGAN DIUBAH
+const FB = "https://forecast-banjarnegara-default-rtdb.asia-southeast1.firebasedatabase.app/";
 
-// ── AUTH STATE ────────────────────────────────────────────────
-// authToken diisi otomatis saat auth state berubah
-let authToken = "";
-let currentUser = null;
+let authToken = null;
+let expBuf = [];
+let syncCountdown = 120; 
+let currentRelayStatus = "OFF";
 
-fbAuth.onAuthStateChanged(async (user) => {
-  if (user) {
-    currentUser = user;
-    // Refresh token secara otomatis (Firebase token expired tiap 1 jam)
-    authToken = await user.getIdToken(true);
-    // Perbarui token tiap 55 menit agar tidak expired
-    setInterval(async () => {
-      try { authToken = await user.getIdToken(true); } catch(e) {}
-    }, 55 * 60 * 1000);
-
-    // Tampilkan info user di topbar
-    const email = user.email || "";
-    const initials = email.charAt(0).toUpperCase();
-    document.getElementById('userAv').textContent   = initials;
-    document.getElementById('userName').textContent = email.split('@')[0];
-
-    // Sembunyikan overlay
-    const ov = document.getElementById('overlay');
-    ov.style.opacity = '0';
-    setTimeout(() => { ov.style.display = 'none'; }, 380);
-
-    startSystem();
-  } else {
-    // Tidak ada user aktif — pastikan overlay tampil
-    currentUser = null; authToken = "";
-    const ov = document.getElementById('overlay');
-    ov.style.display = 'flex';
-    ov.style.opacity = '1';
-  }
-});
-
-// ── LOGIN ─────────────────────────────────────────────────────
-async function doLogin() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const pw    = document.getElementById('loginPw').value;
-  const errEl = document.getElementById('errMsg');
-  const btn   = document.getElementById('btnLogin');
-
-  errEl.style.display = 'none';
-
-  if (!email || !pw) {
-    errEl.textContent   = 'Email dan password wajib diisi!';
-    errEl.style.display = 'block'; return;
-  }
-
-  btn.disabled    = true;
-  btn.textContent = 'Memverifikasi...';
-
-  try {
-    await fbAuth.signInWithEmailAndPassword(email, pw);
-    // onAuthStateChanged akan handle sisanya
-  } catch(err) {
-    const msgs = {
-      'auth/user-not-found':  'Akun tidak ditemukan di sistem.',
-      'auth/wrong-password':  'Password salah. Silakan coba lagi.',
-      'auth/invalid-email':   'Format email tidak valid.',
-      'auth/too-many-requests':'Terlalu banyak percobaan. Coba lagi nanti.',
-      'auth/network-request-failed': 'Koneksi jaringan bermasalah.',
-      'auth/invalid-credential': 'Email atau password salah.'
-    };
-    errEl.textContent   = msgs[err.code] || 'Login gagal: ' + err.message;
-    errEl.style.display = 'block';
-    btn.disabled    = false;
-    btn.textContent = 'Masuk ke Command Center';
-  }
-}
-
-async function doLogout() {
-  if (!confirm('Keluar dari dashboard?')) return;
-  await fbAuth.signOut();
-  location.reload();
-}
-
-// ══════════════════════════════════════════════════════════════════
-// LEAFLET MAP
-// ══════════════════════════════════════════════════════════════════
-function initMap() {
-  const loc = [-7.3970, 109.6972];
-  const map = L.map('pondMap', { zoomControl:false, attributionControl:false }).setView(loc, 16);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom:19 }).addTo(map);
-  const icon = L.divIcon({
-    className:'',
-    html:`<div style="width:13px;height:13px;background:var(--g);border-radius:50%;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3)"></div>`,
-    iconSize:[13,13], iconAnchor:[6,6]
-  });
-  L.marker(loc, { icon }).addTo(map)
-   .bindPopup('<b style="font-family:var(--f);font-size:11px">Kolam A-01</b><br><span style="color:#666;font-size:9px">Area Budidaya Vaname</span>');
-}
-
-// ══════════════════════════════════════════════════════════════════
-// CHART FACTORY
-// ══════════════════════════════════════════════════════════════════
-const COPTS = {
-  responsive:true, maintainAspectRatio:false,
-  animation:{ duration:0 },
-  plugins:{
-    legend:{display:false},
-    tooltip:{
-      mode:'index', intersect:false,
-      backgroundColor:'#fff', titleColor:'#6e8c7b', bodyColor:'#111c16',
-      borderColor:'#e4ebe7', borderWidth:1,
-      titleFont:{family:"'DM Mono',monospace",size:9},
-      bodyFont:{family:"'DM Mono',monospace",size:10},
-      padding:10, cornerRadius:8, displayColors:false
-    }
-  },
-  scales:{
-    x:{ ticks:{color:'#a0b8ab',font:{family:"'DM Mono',monospace",size:9},maxRotation:0}, grid:{display:false}, border:{color:'#e4ebe7'} },
-    y:{ ticks:{color:'#a0b8ab',font:{family:"'DM Mono',monospace",size:9},maxTicksLimit:4}, grid:{color:'#f2f5f3'}, border:{display:false} }
-  }
-};
-
-function mkMain(id, color) {
-  const o = JSON.parse(JSON.stringify(COPTS));
-  return new Chart(document.getElementById(id),{
-    type:'line',
-    data:{labels:[],datasets:[
-      {data:[],borderColor:color,borderWidth:2,backgroundColor:color+'18',fill:true,tension:.35,pointRadius:2,pointHoverRadius:5,pointBackgroundColor:'#fff'},
-      {data:[],borderColor:'rgba(0,0,0,.07)',borderWidth:1,borderDash:[3,4],pointRadius:0,fill:false,tension:0},
-      {data:[],borderColor:'rgba(0,0,0,.07)',backgroundColor:color+'10',borderWidth:1,borderDash:[3,4],pointRadius:0,fill:'-1',tension:0}
-    ]},options:o
-  });
-}
-
-function mkSpark(id, color) {
-  return new Chart(document.getElementById(id),{
-    type:'line',
-    data:{labels:[],datasets:[{data:[],borderColor:color,borderWidth:1.5,backgroundColor:color+'10',fill:true,tension:.3,pointRadius:0}]},
-    options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false}},layout:{padding:0}}
-  });
-}
-
-let mains={}, sparks={}, spHist={DO:[],pH:[],Suhu:[],Sal:[]};
-
-function initCharts() {
-  mains.DO   = mkMain('chartDO',   '#16a966');
-  mains.pH   = mkMain('chartPH',   '#c97a12');
-  mains.Suhu = mkMain('chartSuhu', '#d4294a');
-  mains.Sal  = mkMain('chartSal',  '#2058c4');
-  sparks.DO   = mkSpark('sp_DO',   '#16a966');
-  sparks.pH   = mkSpark('sp_pH',   '#c97a12');
-  sparks.Suhu = mkSpark('sp_Suhu', '#d4294a');
-  sparks.Sal  = mkSpark('sp_Sal',  '#2058c4');
-}
-
-// ══════════════════════════════════════════════════════════════════
-// UTILS
-// ══════════════════════════════════════════════════════════════════
-function getWib() {
+// ── UTILITAS WAKTU ─────────────────────────────
+function getWibDate() {
   const d = new Date();
-  return new Date(d.getTime() + d.getTimezoneOffset()*60000 + 3600000*7);
+  const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+  return new Date(utc + (3600000 * 7));
 }
 
-function pct(v,lo,hi){ return Math.max(0,Math.min(100,((v-lo)/(hi-lo))*100)); }
+// ── SISTEM AUTENTIKASI ─────────────────────────
+async function doLogin() {
+  const em = document.getElementById('inEmail').value;
+  const pw = document.getElementById('inPass').value;
+  const err = document.getElementById('loginError');
+  err.style.display = 'none';
 
-function setBadge(id, state) {
-  const el = document.getElementById(id); if(!el) return;
-  const m = {ok:['b-ok','NORMAL'],warn:['b-warn','WASPADA'],crit:['b-crit','KRITIS'],init:['b-init','—']};
-  const [cls,txt] = m[state]||m.init;
-  el.className='badge '+cls; el.textContent=txt;
-}
-
-function updSpark(key, v) {
-  spHist[key].push(v); if(spHist[key].length>15) spHist[key].shift();
-  const ch=sparks[key];
-  ch.data.labels=spHist[key].map((_,i)=>i);
-  ch.data.datasets[0].data=[...spHist[key]];
-  ch.update('none');
-}
-
-function updMain(ch, lbl, d, mx, mn, innerId) {
-  const inner=document.getElementById(innerId);
-  const calcW=lbl.length*40;
-  inner.style.width = calcW > inner.parentElement.clientWidth ? calcW+'px' : '100%';
-  ch.data.labels=lbl; ch.data.datasets[0].data=d; ch.data.datasets[1].data=mx; ch.data.datasets[2].data=mn;
-  ch.update('none');
-  setTimeout(()=>{ inner.parentElement.scrollLeft=inner.parentElement.scrollWidth; },100);
-}
-
-function updateGauge(id, val, gMin, gMax, tMin, tMax) {
-  const zL=pct(tMin,gMin,gMax), zW=pct(tMax,gMin,gMax)-zL, mPos=pct(val,gMin,gMax);
-  const zEl=document.getElementById('tz_'+id), mEl=document.getElementById('tm_'+id);
-  if(zEl){ zEl.style.left=zL+'%'; zEl.style.width=zW+'%'; }
-  if(mEl){ mEl.style.left=mPos+'%'; mEl.style.background=(val<tMin||val>tMax)?'var(--ro)':'var(--t1)'; }
-}
-
-// ══════════════════════════════════════════════════════════════════
-// LOG
-// ══════════════════════════════════════════════════════════════════
-let logN=0, logBuf=[];
-function addLog(msg, type='info') {
-  const body=document.getElementById('logBody');
-  const init=body.querySelector('[data-init]'); if(init) init.remove();
-  const t=getWib().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
-  logBuf.push({time:t,type:type.toUpperCase(),msg});
-  document.getElementById('logCnt').textContent=++logN;
-  const kind=type==='danger'?'crit':type==='success'?'ok':type;
-  const e=document.createElement('div'); e.className='log-entry';
-  e.innerHTML=`<div class="log-dot ld-${kind}"></div><div class="log-bi"><div class="log-t">${t}</div><div class="log-m ${kind}">${msg}</div></div>`;
-  body.appendChild(e);
-  if(body.children.length>60) body.firstChild.remove();
-  body.scrollTop=body.scrollHeight;
-}
-
-// ══════════════════════════════════════════════════════════════════
-// ALERT BANNER
-// ══════════════════════════════════════════════════════════════════
-let alerts={DO:false,pH:false,Suhu:false,Sal:false};
-function renderBanner() {
-  const any=Object.values(alerts).some(v=>v);
-  const cnt=Object.values(alerts).filter(v=>v).length;
-  const b=document.getElementById('alertBanner'),i=document.getElementById('abIco');
-  const tt=document.getElementById('abTitle'),d=document.getElementById('abDesc'),c=document.getElementById('abChip');
-  if(!any){
-    b.className='banner bn-ok'; i.className='bn-ico bi-ok'; i.textContent='✓';
-    tt.textContent='Semua parameter dalam batas aman';
-    d.textContent='Ekosistem kolam tawar Vaname berjalan optimal. Pertahankan prosedur budidaya harian.';
-    c.style.cssText='border-color:var(--gbdr);color:var(--g);background:var(--gbg)'; c.textContent='SOP Terjaga';
-  } else {
-    b.className='banner bn-crit'; i.className='bn-ico bi-crit'; i.textContent='!';
-    tt.textContent=`Anomali terdeteksi — ${cnt} parameter melewati batas`;
-    d.textContent='Tinjau panel insight dan ambil tindakan pencegahan segera.';
-    c.style.cssText='border-color:rgba(212,41,74,.3);color:var(--ro);background:var(--robg)'; c.textContent='Aksi Segera';
+  if (!em || !pw) {
+    err.textContent = "Email dan sandi wajib diisi.";
+    err.style.display = 'block';
+    return;
   }
-}
 
-// ══════════════════════════════════════════════════════════════════
-// AI INSIGHTS
-// ══════════════════════════════════════════════════════════════════
-let lastReadings=null;
-function calcAI(cur) {
-  if(!lastReadings){ lastReadings=cur; document.getElementById('aiInsight').textContent="Data pertama terekam. Menunggu siklus berikutnya..."; return; }
-  const dDO=cur.DO_mgL-lastReadings.DO_mgL, dSu=cur.temperature_C-lastReadings.temperature_C;
-  let ins="",act="Sistem berjalan otomatis sesuai baseline. Tidak ada intervensi manual yang disarankan saat ini.";
-  if(dDO<-.3){ ins+=`Oksigen turun drastis (${dDO.toFixed(2)} mg/L) dalam 2 menit. `; act="Persiapkan relay kincir sekunder jika tren berlanjut."; }
-  else if(dDO>.3){ ins+=`Transfer oksigen membaik (+${dDO.toFixed(2)} mg/L). `; }
-  if(dSu>.4){ ins+=`Lonjakan suhu pemanasan (+${dSu.toFixed(1)}°C). `; act="Pastikan surface flow kincir bergerak merata."; }
-  if(!ins) ins="Dinamika air kolam berada pada grafik stasioner dan stabil.";
-  document.getElementById('aiInsight').textContent=ins;
-  document.getElementById('aiAction').textContent=act;
-  if(act!=="Sistem berjalan otomatis sesuai baseline. Tidak ada intervensi manual yang disarankan saat ini.") addLog(`💡 AI: ${act}`,'info');
-  lastReadings=cur;
-}
-
-// ══════════════════════════════════════════════════════════════════
-// PROCESS PAYLOAD
-// ══════════════════════════════════════════════════════════════════
-let expBuf=[];
-function processPayload(p) {
-  const nDO=parseFloat(p.DO_mgL), npH=parseFloat(p.pH), nSu=parseFloat(p.temperature_C), nSa=parseFloat(p.salinity_ppt);
-  document.getElementById('val_DO').textContent=p.DO_mgL;
-  document.getElementById('val_pH').textContent=p.pH;
-  document.getElementById('val_Suhu').textContent=p.temperature_C;
-  document.getElementById('val_Sal').textContent=p.salinity_ppt;
-  document.getElementById('tv_DO').textContent=p.DO_mgL+' mg/L';
-  document.getElementById('tv_pH').textContent=p.pH;
-  document.getElementById('tv_Suhu').textContent=p.temperature_C+' °C';
-  document.getElementById('tv_Sal').textContent=p.salinity_ppt+' ppt';
-
-  updateGauge('DO',  nDO,  0,15, 4.5,8.0);
-  updateGauge('pH',  npH,  4,11, 7.5,8.5);
-  updateGauge('Suhu',nSu, 20,40,25.0,31.0);
-  updateGauge('Sal', nSa,  0, 5, 0.0, 1.0);
-
-  updSpark('DO',nDO); updSpark('pH',npH); updSpark('Suhu',nSu); updSpark('Sal',nSa);
-
-  function verify(key,v,lo,hi,unit,bId,tbId){
-    const err=v<lo||v>hi;
-    setBadge(bId,err?'crit':'ok'); setBadge(tbId,err?'crit':'ok');
-    const card=document.getElementById('card_'+key);
-    if(err){ card.classList.add('is-crit'); if(!alerts[key]){ addLog(`WASPADA! ${key} anomali: ${v} ${unit}`,'danger'); alerts[key]=true; } }
-    else{ card.classList.remove('is-crit'); if(alerts[key]){ addLog(`PULIH: ${key} stabil di ${v} ${unit}`,'success'); alerts[key]=false; } }
-  }
-  verify('DO',  nDO, 4.5,8.0, 'mg/L','badge_DO',  'tbg_DO');
-  verify('pH',  npH, 7.5,8.5, 'pH',  'badge_pH',  'tbg_pH');
-  verify('Suhu',nSu,25.0,31.0,'°C',  'badge_Suhu','tbg_Suhu');
-  verify('Sal', nSa, 0.0,1.0, 'ppt', 'badge_Sal', 'tbg_Sal');
-  renderBanner(); calcAI({DO_mgL:nDO,pH:npH,temperature_C:nSu,salinity_ppt:nSa});
-}
-
-// ══════════════════════════════════════════════════════════════════
-// FIREBASE STATUS TOGGLE (menggunakan authToken dari SDK Auth)
-// ══════════════════════════════════════════════════════════════════
-let gStatus='OFF';
-async function fetchStatus() {
-  if(!authToken) return;
+  const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`;
   try {
-    const cb=Date.now();
-    const r=await fetch(`${FB_URL}status.json?auth=${authToken}&_cb=${cb}`,{cache:'no-store'});
-    if(!r.ok) return;
-    gStatus=await r.json()||'OFF';
-    const btn=document.getElementById('btnToggle');
-    if(gStatus==='ON'){ btn.className='btn btn-sys on'; btn.textContent='SYS ACTIVE'; }
-    else{ btn.className='btn btn-sys off'; btn.textContent='SYS HALTED'; }
-  } catch(e){}
-}
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: em, password: pw, returnSecureToken: true })
+    });
+    const data = await res.json();
 
-async function toggleStatus() {
-  if(!authToken){ addLog('Token belum siap, coba lagi.','warn'); return; }
-  const next=gStatus==='ON'?'OFF':'ON';
-  try {
-    await fetch(`${FB_URL}status.json?auth=${authToken}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(next)});
-    gStatus=next; fetchStatus();
-    addLog(`Operator Command: Node dikonfigurasi ke [${gStatus}]`,'warn');
-  } catch(e){ addLog('Gagal mengubah status node.','crit'); }
-}
-
-// ══════════════════════════════════════════════════════════════════
-// FETCH TELEMETRY — path sinkron dengan ESP32
-// ESP32: forecast_2026/{YYYY-MM}/{YYYY-MM-DD}/{HH-MM-SS}
-// Web  : GET forecast_2026/{YYYY-MM}/{YYYY-MM-DD} + limitToLast=all
-// ══════════════════════════════════════════════════════════════════
-async function fetchTelemetry() {
-  if(!authToken) return;
-  syncCountdown=120; // reset timer
-  try {
-    const wib=getWib();
-    const mm=String(wib.getMonth()+1).padStart(2,'0');
-    const dd=String(wib.getDate()).padStart(2,'0');
-    const yymm=`${wib.getFullYear()}-${mm}`;
-    const yymmdd=`${wib.getFullYear()}-${mm}-${dd}`;
-    const cb=Date.now();
-    const url=`${FB_URL}forecast_2026/${yymm}/${yymmdd}.json?auth=${authToken}&orderBy="$key"&_cb=${cb}`;
-    const r=await fetch(url,{cache:'no-store'});
-    if(!r.ok) return;
-    const data=await r.json();
-    if(!data){
-      if(logN===0) addLog(`Menunggu ESP32 mengirim data untuk hari ini (${yymmdd})...`,'info');
-      return;
+    if (data.error) {
+      err.textContent = `Error: ${data.error.message.replace(/_/g, ' ')}`;
+      err.style.display = 'block';
+    } else {
+      authToken = data.idToken;
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('appMain').style.display = 'flex';
+      startSystem();
     }
-    const keys=Object.keys(data).sort();
-    let lbls=[],vDO=[],vPH=[],vSU=[],vSA=[];
-    let mxDO=[],mnDO=[],mxPH=[],mnPH=[],mxSU=[],mnSU=[],mxSA=[],mnSA=[];
-    expBuf=[]; let latest=null;
-    keys.forEach(k=>{
-      const it=data[k];
-      latest={
-        timestamp:it.timestamp||`${yymmdd} ${k.replace(/-/g,':')}`,
-        DO_mgL:parseFloat(it.DO_mgL||0).toFixed(2),
-        pH:parseFloat(it.pH||0).toFixed(2),
-        temperature_C:parseFloat(it.temperature_C||0).toFixed(1),
-        salinity_ppt:parseFloat(it.salinity_ppt||0).toFixed(2)
+  } catch(e) {
+    err.textContent = "Gagal terhubung ke server autentikasi.";
+    err.style.display = 'block';
+  }
+}
+
+// ── INIT PETA LEAFLET ──────────────────────────
+let map;
+function initMap() {
+  if (map) return;
+  const pondLocation = [-7.3970, 109.6972]; // Banjarnegara
+  map = L.map('map').setView(pondLocation, 15);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19, attribution: '© OpenStreetMap'
+  }).addTo(map);
+  L.marker(pondLocation).addTo(map).bindPopup("<b>EBII Node 01</b><br>Banjarnegara").openPopup();
+  document.getElementById('locName').textContent = "Lembah Serayu, Banjarnegara";
+}
+
+// ── INIT CHART.JS ─────────────────────────────
+function makeChart(ctxId, color, label, min, max) {
+  return new Chart(document.getElementById(ctxId).getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        {
+          label: label,
+          data: [],
+          borderColor: color,
+          backgroundColor: color + '15',
+          borderWidth: 2,
+          pointRadius: 3,
+          pointBackgroundColor: '#fff',
+          fill: true,
+          tension: 0.3
+        },
+        { label: 'Batas Atas', data: [], borderColor: '#ef4444', borderDash: [5,5], borderWidth: 1, pointRadius: 0, fill: false },
+        { label: 'Batas Bawah', data: [], borderColor: '#f59e0b', borderDash: [5,5], borderWidth: 1, pointRadius: 0, fill: false }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { display: false }, tooltip: { padding: 10, cornerRadius: 8 } },
+      scales: {
+        x: { grid: { display: false } },
+        y: { min: min, max: max, grid: { borderDash: [4,4], color: '#e4ebe7' } }
+      }
+    }
+  });
+}
+
+let mains = {};
+function initCharts() {
+  mains.DO = makeChart('chartDO', '#059669', 'DO', 0, 10);
+  mains.pH = makeChart('chartPH', '#f59e0b', 'pH', 5, 10);
+  mains.Suhu = makeChart('chartSuhu', '#ef4444', 'Suhu', 20, 40);
+  mains.Sal = makeChart('chartSal', '#3b82f6', 'Salinitas', 0, 5);
+}
+
+// ── PENARIKAN DATA FIREBASE ────────────────────
+
+// Fungsi Cek Status ESP32 (Membaca file status.json)
+async function fetchStatus() {
+  try {
+    const cb = new Date().getTime();
+    const r = await fetch(`${FB}status.json?auth=${authToken}&_nocache=${cb}`);
+    if (!r.ok) return;
+    const v = await r.json(); 
+    
+    const dt = document.getElementById('hwDot');
+    const st = document.getElementById('hwStatus');
+    const relayText = document.getElementById('relayText');
+    
+    currentRelayStatus = v || "OFF";
+    
+    if (currentRelayStatus === "ON") {
+      dt.className = 'dot on'; 
+      st.textContent = 'Sistem Aktif (ESP32 Live)';
+      relayText.textContent = 'Matikan Sistem (ON)';
+      relayText.style.color = 'var(--success)';
+    } else {
+      dt.className = 'dot off'; 
+      st.textContent = 'Sistem Halted';
+      relayText.textContent = 'Hidupkan Sistem (OFF)';
+      relayText.style.color = 'var(--text-2)';
+    }
+  } catch(e) {}
+}
+
+// Fungsi Tombol Nyala/Mati ESP32
+async function toggleRelay() {
+  const next = currentRelayStatus === "ON" ? "OFF" : "ON";
+  try {
+    await fetch(`${FB}status.json?auth=${authToken}`, { 
+      method:'PUT', 
+      headers: {"Content-Type": "application/json"}, 
+      body: JSON.stringify(next) 
+    });
+    fetchStatus(); 
+  } catch(e) {}
+}
+
+function processPayload(latest) {
+  document.getElementById('rtDO').textContent = latest.DO_mgL;
+  document.getElementById('rtPH').textContent = latest.pH;
+  document.getElementById('rtSU').textContent = latest.temperature_C;
+  document.getElementById('rtSA').textContent = latest.salinity_ppt;
+}
+
+function calculateAIInsights(latest) {
+  let issues = [];
+  const d = parseFloat(latest.DO_mgL);
+  const p = parseFloat(latest.pH);
+  const t = parseFloat(latest.temperature_C);
+
+  if (d < 4.5) issues.push("Oksigen Terlarut sangat rendah, risiko hipoksia! Segera hidupkan Aerator Tambahan.");
+  if (p < 7.5) issues.push("Air terlalu asam. Pertimbangkan pemberian kapur dolomit.");
+  if (p > 8.5) issues.push("Air terlalu basa (alkalis).");
+  if (t > 32) issues.push("Suhu air tinggi. Kurangi pakan untuk mencegah penumpukan amonia beracun.");
+
+  const aiEl = document.getElementById('aiInsight');
+  if (issues.length === 0) {
+    aiEl.innerHTML = "<b>Status Ekosistem Stabil.</b> Parameter DO, pH, dan Suhu berada dalam rentang ideal untuk budidaya intensif.";
+  } else {
+    aiEl.innerHTML = "<b>Peringatan Sistem:</b><ul>" + issues.map(i => `<li>${i}</li>`).join('') + "</ul>";
+  }
+}
+
+// Fungsi Update Chart
+function updMain(ch, lbl, d, mx, mn) {
+  ch.data.labels = lbl;
+  ch.data.datasets[0].data = d;
+  ch.data.datasets[1].data = mx;
+  ch.data.datasets[2].data = mn;
+  ch.update();
+}
+
+async function fetchTelemetry() {
+  syncCountdown = 120;
+  try {
+    const wib = getWibDate();
+    const mm = String(wib.getMonth()+1).padStart(2,'0');
+    const dd = String(wib.getDate()).padStart(2,'0');
+    const yymm = `${wib.getFullYear()}-${mm}`;
+    const yymmdd = `${wib.getFullYear()}-${mm}-${dd}`;
+    const cb = new Date().getTime();
+    
+    const url = `${FB}forecast_2026/${yymm}/${yymmdd}.json?auth=${authToken}&_nocache=${cb}`;
+    const r = await fetch(url, { cache: 'no-store' });
+    
+    if (!r.ok) return; 
+    
+    const data = await r.json();
+    if (!data) return; 
+
+    // Sort secara numerik agar garis tidak zig-zag
+    const keys = Object.keys(data).sort((a, b) => a.localeCompare(b, undefined, {numeric: true})); 
+    const recentKeys = keys.slice(-25); 
+    
+    let lbls=[], vDO=[], vPH=[], vSU=[], vSA=[];
+    let mxDO=[], mnDO=[], mxPH=[], mnPH=[], mxSU=[], mnSU=[], mxSA=[], mnSA=[];
+    
+    expBuf = [];
+    let latest = null;
+
+    recentKeys.forEach(k => {
+      const item = data[k];
+      const ts = item.timestamp || `${yymmdd} ${k.replace(/-/g,':')}`;
+      latest = {
+        timestamp: ts,
+        DO_mgL: parseFloat(item.DO_mgL||0).toFixed(2),
+        pH: parseFloat(item.pH||0).toFixed(2),
+        temperature_C: parseFloat(item.temperature_C||0).toFixed(1),
+        salinity_ppt: parseFloat(item.salinity_ppt||0).toFixed(2)
       };
       expBuf.push(latest);
-      lbls.push((latest.timestamp.split(' ')[1]||k).substring(0,5));
+      
+      let shortTime = ts.includes(' ') ? ts.split(' ')[1].substring(0, 5) : (k.length >= 5 ? k.substring(0, 5) : "--:--");
+      
+      lbls.push(shortTime);
       vDO.push(parseFloat(latest.DO_mgL)); mxDO.push(8.0); mnDO.push(4.5);
-      vPH.push(parseFloat(latest.pH));     mxPH.push(8.5); mnPH.push(7.5);
+      vPH.push(parseFloat(latest.pH)); mxPH.push(8.5); mnPH.push(7.5);
       vSU.push(parseFloat(latest.temperature_C)); mxSU.push(31.0); mnSU.push(25.0);
-      vSA.push(parseFloat(latest.salinity_ppt));  mxSA.push(1.0);  mnSA.push(0.0);
+      vSA.push(parseFloat(latest.salinity_ppt)); mxSA.push(1.0); mnSA.push(0.0);
     });
-    if(latest) processPayload(latest);
-    updMain(mains.DO,  lbls,vDO,mxDO,mnDO,'inner_DO');
-    updMain(mains.pH,  lbls,vPH,mxPH,mnPH,'inner_PH');
-    updMain(mains.Suhu,lbls,vSU,mxSU,mnSU,'inner_Suhu');
-    updMain(mains.Sal, lbls,vSA,mxSA,mnSA,'inner_Sal');
-    document.getElementById('lastSync').textContent=getWib().toLocaleTimeString('id-ID',{hour12:false});
-  } catch(e){ addLog('Gagal fetch telemetry: '+e.message,'warn'); }
+
+    if (latest) {
+      processPayload(latest);
+      calculateAIInsights(latest);
+    }
+
+    updMain(mains.DO, lbls, vDO, mxDO, mnDO);
+    updMain(mains.pH, lbls, vPH, mxPH, mnPH);
+    updMain(mains.Suhu, lbls, vSU, mxSU, mnSU);
+    updMain(mains.Sal, lbls, vSA, mxSA, mnSA);
+
+  } catch(e) {} 
 }
 
-// ══════════════════════════════════════════════════════════════════
-// TIMER COUNTDOWN (2 menit)
-// ══════════════════════════════════════════════════════════════════
-let syncCountdown=120;
+// ── EKSEKUSI WAKTU & BOOTSTRAP ────────────────
 function tickTimer() {
   syncCountdown--;
-  if(syncCountdown<0) syncCountdown=119;
-  const m=Math.floor(syncCountdown/60), s=syncCountdown%60;
-  document.getElementById('syncTimer').innerHTML=
-    `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Next Sync: 0${m}:${s.toString().padStart(2,'0')}`;
-  // Update ambient temp + clock
-  const wib=getWib();
-  const h=wib.getHours()+wib.getMinutes()/60;
-  const tmp=Math.round(27+6*Math.max(0,Math.sin((h-8)*Math.PI/12)));
-  const el=document.getElementById('ambTemp'); if(el) el.textContent=tmp+'°C';
-  const wd=document.getElementById('wDate'); if(wd) wd.textContent=wib.toLocaleTimeString('id-ID',{hour12:false})+' WIB';
+  if (syncCountdown <= 0) fetchTelemetry();
+  
+  const m = Math.floor(syncCountdown / 60);
+  const s = syncCountdown % 60;
+  document.getElementById('syncTimer').textContent = `Next Sync: 0${m}:${s.toString().padStart(2, '0')}`;
+  
+  const wib = getWibDate();
+  
+  // JAM DIGITAL DI SIDEBAR
+  const liveClockEl = document.getElementById('liveClock');
+  if (liveClockEl) liveClockEl.textContent = wib.toLocaleTimeString('id-ID', { hour12: false }) + ' WIB';
+  
+  const wcDateEl = document.getElementById('wDate');
+  if (wcDateEl) wcDateEl.textContent = wib.toLocaleTimeString('id-ID', { hour12: false }) + ' WIB';
+  
+  const ambTempEl = document.getElementById('ambTemp');
+  if (ambTempEl) {
+    const amb = Math.round(27 + 6*Math.max(0, Math.sin((wib.getHours()-8)*Math.PI/12)));
+    ambTempEl.textContent = amb + '°C';
+  }
 }
 
-// ══════════════════════════════════════════════════════════════════
-// EXPORT CSV
-// ══════════════════════════════════════════════════════════════════
 function downloadCSV() {
-  if(!expBuf.length){ alert('Data belum tersedia dari ESP32.'); return; }
-  let csv='Timestamp,DO_mgL,pH,Suhu_C,Salinitas_ppt\n';
-  expBuf.forEach(f=>{ csv+=`${f.timestamp},${f.DO_mgL},${f.pH},${f.temperature_C},${f.salinity_ppt}\n`; });
-  csv+='\nWaktu,Status,Deskripsi\n';
-  logBuf.forEach(l=>{ csv+=`${l.time},${l.type},"${l.msg}"\n`; });
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download=`EBII_Report_${new Date().toISOString().split('T')[0]}.csv`;
+  if (!expBuf.length) { alert('Data belum tersedia dari ESP32.'); return; }
+  let csv = 'Timestamp,DO_mgL,pH,Suhu_C,Salinitas_ppt\n';
+  expBuf.forEach(f => csv += `${f.timestamp},${f.DO_mgL},${f.pH},${f.temperature_C},${f.salinity_ppt}\n`);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = `Report_EBII_${new Date().toISOString().split('T')[0]}.csv`;
   a.click();
 }
 
-// ══════════════════════════════════════════════════════════════════
-// SYSTEM BOOTSTRAP (dipanggil setelah login berhasil)
-// ══════════════════════════════════════════════════════════════════
-let sysStarted=false;
+let systemStarted = false;
 function startSystem() {
-  if(sysStarted) return; sysStarted=true;
-  addLog('Autentikasi berhasil. Sistem terkoneksi ke database.','success');
-  fetchStatus(); fetchTelemetry();
-  setInterval(tickTimer,1000);
-  setInterval(fetchStatus,5000);
-  setInterval(fetchTelemetry,120000); // sinkron dengan interval ESP32: 2 menit
-}
+  if (systemStarted) return;
+  systemStarted = true;
 
-// ══════════════════════════════════════════════════════════════════
-// WINDOW LOAD — init charts, map, clock
-// ══════════════════════════════════════════════════════════════════
-window.addEventListener('load',()=>{
-  initMap();
   initCharts();
-  // Jam jalan meski belum login
-  setInterval(()=>{
-    document.getElementById('liveClock').textContent=getWib().toLocaleTimeString('id-ID',{hour12:false});
-  },1000);
-});
+  setTimeout(initMap, 500);
+  
+  fetchStatus();
+  fetchTelemetry();
+  
+  setInterval(tickTimer, 1000); 
+  setInterval(fetchStatus, 3000); 
+}
 </script>
 </body>
 </html>
