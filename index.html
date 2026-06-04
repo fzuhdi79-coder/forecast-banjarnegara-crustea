@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Crustea EBII · Pro Command Center</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght=0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -130,18 +130,18 @@ body {
 .btn-green { background: var(--success); color: white; border-color: var(--success); }
 .btn-green:hover { background: #0ea5e9; border-color: #0ea5e9; }
 
-/* -- WIDGET ALARM & REKOMENDASI -- */
+/* -- WIDGET ALARM REALTIME -- */
 .alarm-widget {
   border-radius: var(--rad);
   padding: 1.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   box-shadow: var(--shadow);
   transition: all 0.4s ease;
   color: white;
 }
 .alarm-widget.safe {
   background: linear-gradient(135deg, #064e3b 0%, #059669 100%);
-  box-shadow: 0 10px 25px rgba(5,150,105,0.2);
+  box-shadow: 0 10px 25px rgba(5,150,105,0.15);
 }
 .alarm-widget.danger {
   background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%);
@@ -152,6 +152,54 @@ body {
 .alarm-content p { font-size: 0.95rem; opacity: 0.95; line-height: 1.6; }
 .alarm-content ul { margin-left: 1.5rem; margin-top: 0.5rem; line-height: 1.6;}
 .alarm-content li { margin-bottom: 0.5rem; font-size: 0.95rem; }
+
+/* -- WIDGET LOG TERMINAL (BARU) -- */
+.log-container {
+  max-height: 250px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding-right: 6px;
+}
+.log-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--rad-sm);
+  background: var(--surface-2);
+  border-left: 4px solid var(--border);
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+.log-item.danger-log {
+  border-left-color: var(--danger);
+  background: #fff5f5;
+}
+.log-item .log-time {
+  font-family: 'DM Mono', monospace;
+  font-weight: 600;
+  color: var(--text-2);
+  background: var(--surface-3);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+.log-item .log-msg { flex: 1; color: var(--text); }
+.log-item .log-saran {
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--primary-l);
+  font-weight: 600;
+}
+
+/* Custom Scrollbar untuk Log Terminal */
+.log-container::-webkit-scrollbar { width: 6px; }
+.log-container::-webkit-scrollbar-track { background: var(--surface-2); border-radius: 10px; }
+.log-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+.log-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
 @keyframes pulse-danger {
   0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6); }
@@ -240,7 +288,7 @@ body {
     <div class="sb-foot">
       <div id="syncTimer" class="mono" style="margin-bottom:4px; font-weight:600; color:var(--primary)">Next Sync: --:--</div>
       <div id="liveClock" class="mono">--:--:-- WIB</div>
-      <div style="margin-top: 8px;">v3.0.0-pro (Auto-Login)</div>
+      <div style="margin-top: 8px;">v3.1.0-pro (With Log Terminal)</div>
     </div>
   </aside>
 
@@ -271,6 +319,19 @@ body {
       </div>
       <div id="alarmContent" class="alarm-content">
         <p>Menunggu data telemetri dari sensor untuk dianalisis...</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 2rem;">
+      <div class="card-head">
+        <h3 style="color: var(--text); font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+          Log Riwayat Alarm & Rekomendasi Pakar
+        </h3>
+        <span id="logCounter" class="mono" style="font-size: 0.8rem; background: var(--surface-3); padding: 0.25rem 0.6rem; border-radius: 20px; font-weight: 600; color: var(--text-2);">0 Masalah Terdeteksi</span>
+      </div>
+      <div id="alarmLogTerminal" class="log-container">
+        <p style="color: var(--text-2); font-size: 0.9rem; font-style: italic; padding: 0.5rem 0;">Belum ada riwayat anomali pada jendela data saat ini.</p>
       </div>
     </div>
 
@@ -380,7 +441,6 @@ body {
 const API_KEY = "AIzaSyDoBiXA94eozZtZr5p6_FYnCBujj1fl8fs"; 
 const FB = "https://forecast-banjarnegara-default-rtdb.asia-southeast1.firebasedatabase.app/";
 
-// ── SISTEM PERSISTENT LOGIN (LOCAL STORAGE) ──
 let authToken = localStorage.getItem('crustea_auth_token') || null;
 let expBuf = [];
 let syncCountdown = 120; 
@@ -404,63 +464,42 @@ function getWibDate() {
 async function doLogin() {
   let emRaw = document.getElementById('inEmail').value;
   let pwRaw = document.getElementById('inPass').value;
-  
   const em = emRaw.replace(/[^\x20-\x7E]/g, '').trim();
   const pw = pwRaw.replace(/[^\x20-\x7E]/g, '').trim();
-
   const err = document.getElementById('loginError');
   err.style.display = 'none';
 
   if (!em || !pw) {
-    err.textContent = "Email dan sandi wajib diisi.";
-    err.style.display = 'block';
-    return;
+    err.textContent = "Email dan sandi wajib diisi."; err.style.display = 'block'; return;
   }
-
   if (!em.includes('@') || !em.includes('.')) {
-    err.textContent = "Format salah! Harus alamat email lengkap.";
-    err.style.display = 'block';
-    return;
+    err.textContent = "Format salah! Harus alamat email lengkap."; err.style.display = 'block'; return;
   }
 
-  err.style.display = 'block';
-  err.style.color = '#3b82f6';
-  err.textContent = "Memverifikasi ke server...";
-
+  err.style.display = 'block'; err.style.color = '#3b82f6'; err.textContent = "Memverifikasi ke server...";
   const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`;
   try {
     const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: em, password: pw, returnSecureToken: true })
     });
     const data = await res.json();
-
     if (data.error) {
       err.style.color = 'var(--danger)';
       let msg = data.error.message;
-      if (msg === "EMAIL_NOT_FOUND") msg = "Email ini belum didaftarkan di Firebase.";
+      if (msg === "EMAIL_NOT_FOUND") msg = "Email ini belum didaftarkan.";
       else if (msg === "INVALID_PASSWORD") msg = "Kata sandi salah.";
-      else if (msg === "INVALID_EMAIL") msg = "Format email ditolak oleh server Google.";
-      else if (msg === "USER_DISABLED") msg = "Akun ini telah dinonaktifkan.";
       err.textContent = `Gagal: ${msg}`;
     } else {
-      authToken = data.idToken;
-      localStorage.setItem('crustea_auth_token', authToken);
+      authToken = data.idToken; localStorage.setItem('crustea_auth_token', authToken);
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('appMain').style.display = 'flex';
       startSystem();
     }
-  } catch(e) {
-    err.style.color = 'var(--danger)';
-    err.textContent = "Gagal terhubung ke server autentikasi (Cek koneksi internet).";
-  }
+  } catch(e) { err.style.color = 'var(--danger)'; err.textContent = "Gagal terhubung ke server."; }
 }
 
-function doLogout() {
-  localStorage.removeItem('crustea_auth_token');
-  location.reload();
-}
+function doLogout() { localStorage.removeItem('crustea_auth_token'); location.reload(); }
 
 // ── INIT PETA LEAFLET ──
 let map;
@@ -468,9 +507,7 @@ function initMap() {
   if (map) return;
   const pondLocation = [-7.3970, 109.6972]; 
   map = L.map('map').setView(pondLocation, 15);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    maxZoom: 19, attribution: '© OpenStreetMap'
-  }).addTo(map);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
   L.marker(pondLocation).addTo(map).bindPopup("<b>EBII Node 01</b><br>Banjarnegara").openPopup();
   document.getElementById('locName').textContent = "Lembah Serayu, Banjarnegara";
 }
@@ -482,32 +519,12 @@ function makeChart(ctxId, color, label, min, max) {
     data: {
       labels: [],
       datasets: [
-        {
-          label: label,
-          data: [],
-          borderColor: color,
-          backgroundColor: color + '15',
-          borderWidth: 2,
-          pointRadius: 3,
-          pointBackgroundColor: '#fff',
-          fill: true,
-          tension: 0.3
-        },
+        { label: label, data: [], borderColor: color, backgroundColor: color + '15', borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#fff', fill: true, tension: 0.3 },
         { label: 'Batas Atas', data: [], borderColor: '#ef4444', borderDash: [5,5], borderWidth: 1, pointRadius: 0, fill: false },
         { label: 'Batas Bawah', data: [], borderColor: '#f59e0b', borderDash: [5,5], borderWidth: 1, pointRadius: 0, fill: false }
       ]
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: { legend: { display: false }, tooltip: { padding: 10, cornerRadius: 8 } },
-      scales: {
-        x: { grid: { display: false } },
-        y: { min: min, max: max, grid: { borderDash: [4,4], color: '#e4ebe7' } }
-      }
-    }
+    options: { responsive: true, maintainAspectRatio: false, animation: false, scales: { x: { grid: { display: false } }, y: { min: min, max: max } } }
   });
 }
 
@@ -519,7 +536,7 @@ function initCharts() {
   mains.Sal = makeChart('chartSal', '#3b82f6', 'Salinitas', 0, 5);
 }
 
-// ── LOGIKA ALARM & REKOMENDASI ──
+// ── LOGIKA ALARM REALTIME (STATUS TERBARU SAAT INI) ──
 function checkAlarmsAndRecommendations(latest) {
   const d = parseFloat(latest.DO_mgL);
   const p = parseFloat(latest.pH);
@@ -527,53 +544,83 @@ function checkAlarmsAndRecommendations(latest) {
   const s = parseFloat(latest.salinity_ppt);
 
   let alarms = [];
+  if (d < 4.5) alarms.push(`<b>Oksigen Drop (${d} mg/L):</b> Bahaya hipoksia.<br><i>Saran: Hidupkan aerator/kincir ke kecepatan penuh!</i>`);
+  else if (d > 8.0) alarms.push(`<b>Oksigen Tinggi (${d} mg/L):</b> Supersaturasi.<br><i>Saran: Kurangi operasional kincir sementara waktu.</i>`);
 
-  // 1. Cek DO (Oksigen Terlarut)
-  if (d < 4.5) {
-    alarms.push(`<b>Oksigen Drop (${d} mg/L):</b> Risiko fatal ikan/udang mati lemas (hipoksia).<br><i>Saran: Segera nyalakan kincir/aerator ke kapasitas maksimal!</i>`);
-  } else if (d > 8.0) {
-    alarms.push(`<b>Oksigen Berlebih (${d} mg/L):</b> Supersaturasi oksigen.<br><i>Saran: Matikan sebagian kincir di siang hari untuk menghemat energi.</i>`);
-  }
+  if (p < 7.5) alarms.push(`<b>pH Asam (${p}):</b> Risiko stres udang/ikan.<br><i>Saran: Tebarkan dolomit/kalsit secara bertahap.</i>`);
+  else if (p > 8.5) alarms.push(`<b>pH Basa (${p}):</b> Amonia menjadi toksik.<br><i>Saran: Berikan molase/probiotik atau flushing air.</i>`);
 
-  // 2. Cek pH (Keasaman)
-  if (p < 7.5) {
-    alarms.push(`<b>pH Asam (${p}):</b> Menurunkan nafsu makan dan memicu stres.<br><i>Saran: Taburkan kapur pertanian (dolomit/kalsit) secukupnya pada area tambak.</i>`);
-  } else if (p > 8.5) {
-    alarms.push(`<b>pH Basa/Alkali (${p}):</b> Meningkatkan toksisitas amonia.<br><i>Saran: Aplikasikan molase/probiotik atau lakukan pergantian air (flushing).</i>`);
-  }
+  if (t < 25.0) alarms.push(`<b>Suhu Rendah (${t} °C):</b> Pencernaan melambat.<br><i>Saran: Kurangi pakan harian agar tidak mengendap jadi amonia.</i>`);
+  else if (t > 31.0) alarms.push(`<b>Suhu Tinggi (${t} °C):</b> Bakteri patogen aktif.<br><i>Saran: Naikkan kedalaman atau volume air kolam.</i>`);
 
-  // 3. Cek Suhu
-  if (t < 25.0) {
-    alarms.push(`<b>Suhu Terlalu Dingin (${t} °C):</b> Metabolisme dan pencernaan melambat.<br><i>Saran: Kurangi porsi pakan harian agar tidak ada pakan tersisa (limbah).</i>`);
-  } else if (t > 31.0) {
-    alarms.push(`<b>Suhu Terlalu Panas (${t} °C):</b> Risiko meledaknya bakteri patogen.<br><i>Saran: Tambahkan volume kedalaman air tambak jika memungkinkan.</i>`);
-  }
+  if (s > 1.0) alarms.push(`<b>Salinitas Tinggi (${s} ppt):</b> Melebihi ambang tawar.<br><i>Saran: Tambahkan suplai air tawar bersih.</i>`);
 
-  // 4. Cek Salinitas
-  if (s > 1.0) {
-    alarms.push(`<b>Salinitas Tinggi (${s} ppt):</b> Sudah melampaui batas air tawar.<br><i>Saran: Segera pompakan air tawar baru ke dalam kolam.</i>`);
-  }
-
-  // Update UI Widget
   const widget = document.getElementById('alarmWidget');
   const title = document.getElementById('alarmTitle');
   const content = document.getElementById('alarmContent');
   const icon = document.getElementById('alarmIcon');
 
   if (alarms.length === 0) {
-    // Kondisi AMAN
-    widget.className = 'alarm-widget safe';
-    title.textContent = 'Status Ekosistem: AMAN NORMAL';
-    content.innerHTML = '<p>Seluruh indikator kualitas air (DO, pH, Suhu, Salinitas) terpantau di dalam rentang ideal budidaya. Lanjutkan rutinitas pemberian pakan standar.</p>';
-    // Ikon Centang
+    widget.className = 'alarm-widget safe'; title.textContent = 'Status Ekosistem: AMAN NORMAL';
+    content.innerHTML = '<p>Seluruh indikator kualitas air terpantau di dalam rentang ideal budidaya. Lanjutkan manajemen pakan reguler.</p>';
     icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
   } else {
-    // Kondisi BAHAYA
-    widget.className = 'alarm-widget danger';
-    title.textContent = 'ALARM PERINGATAN: Tindakan Diperlukan!';
-    content.innerHTML = '<ul>' + alarms.map(a => `<li style="margin-bottom:10px;">${a}</li>`).join('') + '</ul>';
-    // Ikon Segitiga Seru (Warning)
+    widget.className = 'alarm-widget danger'; title.textContent = 'ALARM PERINGATAN: Kondisi Saat Ini Kritis!';
+    content.innerHTML = '<ul>' + alarms.map(a => `<li style="margin-bottom:6px;">${a}</li>`).join('') + '</ul>';
     icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>';
+  }
+}
+
+// ── LENGKAP: GENERATOR LOG TERMINAL RIWAYAT (WIDGET BARU) ──
+function generateAlarmLogs(dataBuffer) {
+  const terminal = document.getElementById('alarmLogTerminal');
+  const counter = document.getElementById('logCounter');
+  let logHtml = '';
+  let totalAnomalies = 0;
+
+  // Scan dari data terbaru ke data terlama (Urutan Terbalik agar yang baru muncul di atas)
+  for (let i = dataBuffer.length - 1; i >= 0; i--) {
+    const item = dataBuffer[i];
+    const d = parseFloat(item.DO_mgL);
+    const p = parseFloat(item.pH);
+    const t = parseFloat(item.temperature_C);
+    const s = parseFloat(item.salinity_ppt);
+    
+    // Ambil jam menit saja
+    const shortTime = item.timestamp.includes(' ') ? item.timestamp.split(' ')[1].substring(0, 5) : "--:--";
+    
+    let anomaliesInRecord = [];
+
+    if (d < 4.5) anomaliesInRecord.push({ param: "Oksigen Terlalu Rendah", val: `${d} mg/L`, saran: "Nyalakan kincir air segera." });
+    if (d > 8.0) anomaliesInRecord.push({ param: "Oksigen Melampaui Batas", val: `${d} mg/L`, saran: "Evaluasi penggunaan kincir." });
+    if (p < 7.5) anomaliesInRecord.push({ param: "pH Di Bawah Batas Aman", val: p, saran: "Taburkan kapur pertanian dolomit." });
+    if (p > 8.5) anomaliesInRecord.push({ param: "pH Di Atas Batas Aman", val: p, saran: "Aplikasikan molase / asam organik." });
+    if (t < 25.0) anomaliesInRecord.push({ param: "Suhu Drop Ekstrim", val: `${t}°C`, saran: "Kurangi kuantitas tebar pakan." });
+    if (t > 31.0) anomaliesInRecord.push({ param: "Suhu Terlalu Tinggi", val: `${t}°C`, saran: "Tambahkan debit pasokan air kolam." });
+    if (s > 1.0) anomaliesInRecord.push({ param: "Salinitas Terdeteksi Naik", val: `${s} ppt`, saran: "Lakukan pengenceran dengan air tawar." });
+
+    if (anomaliesInRecord.length > 0) {
+      anomaliesInRecord.forEach(anom => {
+        totalAnomalies++;
+        logHtml += `
+          <div class="log-item danger-log">
+            <span class="log-time">${shortTime} WIB</span>
+            <div class="log-msg">
+              Sensor mendeteksi <strong>${anom.param}</strong> senilai <b>${anom.val}</b>.
+              <div class="log-saran">💡 Saran Tindakan: ${anom.saran}</div>
+            </div>
+          </div>
+        `;
+      });
+    }
+  }
+
+  if (totalAnomalies > 0) {
+    terminal.innerHTML = logHtml;
+    counter.textContent = `${totalAnomalies} Masalah Terdeteksi`;
+  } else {
+    terminal.innerHTML = '<p style="color: var(--text-2); font-size: 0.9rem; font-style: italic; padding: 0.5rem 0;">✅ Hebat! Seluruh riwayat data sensor berada pada batasan aman.</p>';
+    counter.textContent = `0 Masalah Terdeteksi`;
   }
 }
 
@@ -584,24 +631,12 @@ async function fetchStatus() {
     const r = await fetch(`${FB}status.json?auth=${authToken}&_nocache=${cb}`);
     if (!r.ok && r.status === 401) { doLogout(); return; }
     if (!r.ok) return;
-
-    const v = await r.json(); 
-    const dt = document.getElementById('hwDot');
-    const st = document.getElementById('hwStatus');
-    const relayText = document.getElementById('relayText');
-    
-    currentRelayStatus = v || "OFF";
-    
+    currentRelayStatus = await r.json() || "OFF";
+    const dt = document.getElementById('hwDot'); const st = document.getElementById('hwStatus'); const rt = document.getElementById('relayText');
     if (currentRelayStatus === "ON") {
-      dt.className = 'dot on'; 
-      st.textContent = 'Sistem Aktif (ESP32 Live)';
-      relayText.textContent = 'Matikan Sistem (ON)';
-      relayText.style.color = 'var(--success)';
+      dt.className = 'dot on'; st.textContent = 'Sistem Aktif (ESP32 Live)'; rt.textContent = 'Matikan Sistem (ON)'; rt.style.color = 'var(--success)';
     } else {
-      dt.className = 'dot off'; 
-      st.textContent = 'Sistem Halted';
-      relayText.textContent = 'Hidupkan Sistem (OFF)';
-      relayText.style.color = 'var(--text-2)';
+      dt.className = 'dot off'; st.textContent = 'Sistem Halted'; rt.textContent = 'Hidupkan Sistem (OFF)'; rt.style.color = 'var(--text-2)';
     }
   } catch(e) {}
 }
@@ -609,12 +644,7 @@ async function fetchStatus() {
 async function toggleRelay() {
   const next = currentRelayStatus === "ON" ? "OFF" : "ON";
   try {
-    await fetch(`${FB}status.json?auth=${authToken}`, { 
-      method:'PUT', 
-      headers: {"Content-Type": "application/json"}, 
-      body: JSON.stringify(next) 
-    });
-    fetchStatus(); 
+    await fetch(`${FB}status.json?auth=${authToken}`, { method:'PUT', body: JSON.stringify(next) }); fetchStatus();
   } catch(e) {}
 }
 
@@ -625,55 +655,35 @@ function processPayload(latest) {
   document.getElementById('rtSA').textContent = latest.salinity_ppt;
 }
 
-function updMain(ch, lbl, d, mx, mn) {
-  ch.data.labels = lbl;
-  ch.data.datasets[0].data = d;
-  ch.data.datasets[1].data = mx;
-  ch.data.datasets[2].data = mn;
-  ch.update();
-}
+function updMain(ch, lbl, d, mx, mn) { ch.data.labels = lbl; ch.data.datasets[0].data = d; ch.data.datasets[1].data = mx; ch.data.datasets[2].data = mn; ch.update(); }
 
 async function fetchTelemetry() {
   syncCountdown = 120;
   try {
     const wib = getWibDate();
-    const mm = String(wib.getMonth()+1).padStart(2,'0');
-    const dd = String(wib.getDate()).padStart(2,'0');
-    
-    let yymmdd = `${wib.getFullYear()}-${mm}-${dd}`;
-    let yymm = `${wib.getFullYear()}-${mm}`;
-    const cb = new Date().getTime();
+    const mm = String(wib.getMonth()+1).padStart(2,'0'); const dd = String(wib.getDate()).padStart(2,'0');
+    let yymmdd = `${wib.getFullYear()}-${mm}-${dd}`; let yymm = `${wib.getFullYear()}-${mm}`; const cb = new Date().getTime();
     
     let url = `${FB}forecast_2026/${yymm}/${yymmdd}.json?auth=${authToken}&_nocache=${cb}`;
     let r = await fetch(url, { cache: 'no-store' });
-    
     if (!r.ok && r.status === 401) { doLogout(); return; }
-
     let data = await r.json();
-    
     if (!data) {
-      let fallbackYymmdd = "2026-06-04"; 
-      let fallbackYymm = "2026-06";
+      let fallbackYymmdd = "2026-06-04"; let fallbackYymm = "2026-06";
       url = `${FB}forecast_2026/${fallbackYymm}/${fallbackYymmdd}.json?auth=${authToken}&_nocache=${cb}`;
-      r = await fetch(url, { cache: 'no-store' });
-      data = await r.json();
+      r = await fetch(url, { cache: 'no-store' }); data = await r.json();
     }
-    
-    if (!data) return; 
+    if (!data) return;
 
-    const keys = Object.keys(data).sort((a, b) => a.localeCompare(b, undefined, {numeric: true})); 
-    const recentKeys = keys.slice(-25); 
+    const keys = Object.keys(data).sort((a, b) => a.localeCompare(b, undefined, {numeric: true}));
+    const recentKeys = keys.slice(-25);
     
     let lbls=[], vDO=[], vPH=[], vSU=[], vSA=[];
     let mxDO=[], mnDO=[], mxPH=[], mnPH=[], mxSU=[], mnSU=[], mxSA=[], mnSA=[];
-    
-    expBuf = [];
-    let latest = null;
+    expBuf = []; let latest = null;
 
     recentKeys.forEach(k => {
-      const item = data[k];
-      if(typeof item !== 'object' || item === null) return; 
-      
+      const item = data[k]; if(typeof item !== 'object' || item === null) return;
       const ts = item.timestamp || `${yymmdd} ${k.replace(/-/g,':')}`;
       latest = {
         timestamp: ts,
@@ -683,9 +693,7 @@ async function fetchTelemetry() {
         salinity_ppt: parseFloat(item.salinity_ppt||0).toFixed(2)
       };
       expBuf.push(latest);
-      
       let shortTime = ts.includes(' ') ? ts.split(' ')[1].substring(0, 5) : (k.length >= 5 ? k.substring(0, 5) : "--:--");
-      
       lbls.push(shortTime);
       vDO.push(parseFloat(latest.DO_mgL)); mxDO.push(8.0); mnDO.push(4.5);
       vPH.push(parseFloat(latest.pH)); mxPH.push(8.5); mnPH.push(7.5);
@@ -695,37 +703,27 @@ async function fetchTelemetry() {
 
     if (latest) {
       processPayload(latest);
-      checkAlarmsAndRecommendations(latest); // PANGGIL WIDGET ALARM DI SINI
+      checkAlarmsAndRecommendations(latest); // Widget atas (Realtime saat ini)
+      generateAlarmLogs(expBuf);             // Widget baru (Log Terminal Riwayat)
     }
 
     updMain(mains.DO, lbls, vDO, mxDO, mnDO);
     updMain(mains.pH, lbls, vPH, mxPH, mnPH);
     updMain(mains.Suhu, lbls, vSU, mxSU, mnSU);
     updMain(mains.Sal, lbls, vSA, mxSA, mnSA);
-
-  } catch(e) {} 
+  } catch(e) {}
 }
 
 function tickTimer() {
-  syncCountdown--;
-  if (syncCountdown <= 0) fetchTelemetry();
-  
-  const m = Math.floor(syncCountdown / 60);
-  const s = syncCountdown % 60;
+  syncCountdown--; if (syncCountdown <= 0) fetchTelemetry();
+  const m = Math.floor(syncCountdown / 60); const s = syncCountdown % 60;
   document.getElementById('syncTimer').textContent = `Next Sync: 0${m}:${s.toString().padStart(2, '0')}`;
-  
   const wib = getWibDate();
-  
-  const liveClockEl = document.getElementById('liveClock');
-  if (liveClockEl) liveClockEl.textContent = wib.toLocaleTimeString('id-ID', { hour12: false }) + ' WIB';
-  
-  const wcDateEl = document.getElementById('wDate');
-  if (wcDateEl) wcDateEl.textContent = wib.toLocaleTimeString('id-ID', { hour12: false }) + ' WIB';
-  
+  const liveClockEl = document.getElementById('liveClock'); if (liveClockEl) liveClockEl.textContent = wib.toLocaleTimeString('id-ID', { hour12: false }) + ' WIB';
+  const wcDateEl = document.getElementById('wDate'); if (wcDateEl) wcDateEl.textContent = wib.toLocaleTimeString('id-ID', { hour12: false }) + ' WIB';
   const ambTempEl = document.getElementById('ambTemp');
   if (ambTempEl) {
-    const amb = Math.round(27 + 6*Math.max(0, Math.sin((wib.getHours()-8)*Math.PI/12)));
-    ambTempEl.textContent = amb + '°C';
+    const amb = Math.round(27 + 6*Math.max(0, Math.sin((wib.getHours()-8)*Math.PI/12))); ambTempEl.textContent = amb + '°C';
   }
 }
 
@@ -733,25 +731,15 @@ function downloadCSV() {
   if (!expBuf.length) { alert('Data belum tersedia dari ESP32.'); return; }
   let csv = 'Timestamp,DO_mgL,pH,Suhu_C,Salinitas_ppt\n';
   expBuf.forEach(f => csv += `${f.timestamp},${f.DO_mgL},${f.pH},${f.temperature_C},${f.salinity_ppt}\n`);
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-  a.download = `Report_EBII_${new Date().toISOString().split('T')[0]}.csv`;
-  a.click();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = `Report_EBII_${new Date().toISOString().split('T')[0]}.csv`; a.click();
 }
 
 let systemStarted = false;
 function startSystem() {
-  if (systemStarted) return;
-  systemStarted = true;
-
-  initCharts();
-  setTimeout(initMap, 500);
-  
-  fetchStatus();
-  fetchTelemetry();
-  
-  setInterval(tickTimer, 1000); 
-  setInterval(fetchStatus, 4000); 
+  if (systemStarted) return; systemStarted = true;
+  initCharts(); setTimeout(initMap, 500); fetchStatus(); fetchTelemetry();
+  setInterval(tickTimer, 1000); setInterval(fetchStatus, 4000);
 }
 </script>
 </body>
