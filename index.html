@@ -274,10 +274,6 @@ body {
     <div class="login-logo-center">
       <div class="logo-container">
         <img src="crustea.png" alt="Logo" class="logo-img" onerror="this.src='https://placehold.co/100x100?text=LOGO'">
-        <div class="logo-text-group">
-          <span class="logo-main-text">EBII System</span>
-          <span class="logo-sub-text">Crustea</span>
-        </div>
       </div>
     </div>
     
@@ -299,10 +295,6 @@ body {
     <div class="sb-head">
       <div class="logo-container">
         <img src="crustea.png" alt="Logo" class="logo-img" onerror="this.src='https://placehold.co/100x100?text=LOGO'">
-        <div class="logo-text-group">
-          <span class="logo-sub-text">EBII System</span>
-          <span class="logo-sub-text">Crustea</span>
-        </div>
       </div>
     </div>
     
@@ -330,8 +322,8 @@ body {
   <main class="content">
     <div class="top-bar">
       <div class="top-title">
-        <h2>Pemantauan Kualitas Air</h2>
-        <p>Lokasi Terdaftar: <span id="locName" style="font-weight: 600; color: var(--text-main);">Mengambil satelit...</span></p>
+        <h2>EBII System Crustea</h2>
+        <p>Lokasi : <span id="locName" style="font-weight: 600; color: var(--text-main);">Mengambil satelit...</span></p>
       </div>
       <div class="top-actions">
         <div class="status-badge">
@@ -542,7 +534,7 @@ function initMap() {
   map = L.map('map').setView(pondLocation, 15);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
   L.marker(pondLocation).addTo(map).bindPopup("<b style='font-family:Plus Jakarta Sans;'>EBII Node 01</b><br>Banjarnegara").openPopup();
-  document.getElementById('locName').textContent = "Lembah Serayu, Banjarnegara";
+  document.getElementById('locName').textContent = "Kab. Banjarnegara";
 }
 
 function makeChart(ctxId, color, label, min, max) {
@@ -582,11 +574,11 @@ function listenStatus() {
     const dt = document.getElementById('hwDot'); const st = document.getElementById('hwStatus'); const relayText = document.getElementById('relayText');
     currentRelayStatus = v || "OFF";
     if (currentRelayStatus === "ON") {
-      dt.className = 'dot on'; st.textContent = 'Sistem Aktif (Live)';
-      relayText.textContent = 'Matikan Sistem (ON)'; relayText.style.color = 'var(--success)';
+      dt.className = 'dot on'; st.textContent = 'Sistem Aktif)';
+      relayText.textContent = 'Stop System (ON)'; relayText.style.color = 'var(--success)';
     } else {
       dt.className = 'dot off'; st.textContent = 'Sistem Halted';
-      relayText.textContent = 'Hidupkan Sistem (OFF)'; relayText.style.color = 'var(--text-muted)';
+      relayText.textContent = 'Start System (OFF)'; relayText.style.color = 'var(--text-muted)';
     }
   });
 }
