@@ -68,25 +68,32 @@ body {
 .logo-container {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  gap: 1rem; /* Jarak antara logo dan teks sedikit diperlebar */
   text-align: left;
+  width: 100%;
 }
 .logo-img {
-  height: 42px;
+  height: 46px; 
   width: auto;
+  max-width: 75px; /* Membatasi lebar logo agar tidak memakan tempat teks */
   object-fit: contain;
-  border-radius: 6px;
+  flex-shrink: 0; /* KUNCI: Mencegah logo tertekan oleh teks */
 }
 .logo-text-group {
   display: flex;
   flex-direction: column;
+  flex: 1; /* Memastikan grup teks menggunakan sisa ruang dengan baik */
+  justify-content: center;
+  overflow: hidden; /* Mencegah teks tumpah keluar area */
 }
 .logo-main-text {
-  font-size: 1.25rem;
+  font-size: 1.15rem; /* Ukuran font disesuaikan sedikit agar lebih seimbang */
   font-weight: 800;
   color: var(--text-main);
   line-height: 1.2;
   letter-spacing: -0.5px;
+  white-space: nowrap; /* Mencegah judul patah ke bawah */
+  text-overflow: ellipsis;
 }
 .logo-sub-text {
   font-size: 0.75rem;
@@ -94,6 +101,7 @@ body {
   color: var(--text-muted);
   letter-spacing: 0.5px;
   text-transform: uppercase;
+  white-space: nowrap; /* Mencegah sub-judul patah ke bawah */
 }
 
 /* -- LOGIN SCREEN -- */
