@@ -404,16 +404,29 @@ function getWibDate() {
 
 // ── FUNGSI LOGIN & LOGOUT ──
 async function doLogin() {
-  const em = document.getElementById('inEmail').value;
-  const pw = document.getElementById('inPass').value;
+  // .trim() akan OTOMATIS menghapus spasi gaib di awal/akhir ketikan Anda!
+  const em = document.getElementById('inEmail').value.trim();
+  const pw = document.getElementById('inPass').value.trim();
   const err = document.getElementById('loginError');
   err.style.display = 'none';
 
+  // 1. Cek jika kosong
   if (!em || !pw) {
     err.textContent = "Email dan sandi wajib diisi.";
     err.style.display = 'block';
     return;
   }
+
+  // 2. Cek apakah formatnya benar-benar email (punya @ dan titik)
+  if (!em.includes('@') || !em.includes('.')) {
+    err.textContent = "Format salah! Harus alamat email lengkap (contoh: admin@crustea.id)";
+    err.style.display = 'block';
+    return;
+  }
+
+  err.style.display = 'block';
+  err.style.color = '#3b82f6'; // Warna biru info
+  err.textContent = "Memverifikasi ke server...";
 
   const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`;
   try {
@@ -425,8 +438,15 @@ async function doLogin() {
     const data = await res.json();
 
     if (data.error) {
-      err.textContent = `Error: ${data.error.message.replace(/_/g, ' ')}`;
-      err.style.display = 'block';
+      err.style.color = 'var(--danger)'; // Kembali merah jika gagal
+      // Terjemahkan error Google agar lebih mudah dipahami
+      let msg = data.error.message;
+      if (msg === "EMAIL_NOT_FOUND") msg = "Email ini belum didaftarkan di Firebase.";
+      else if (msg === "INVALID_PASSWORD") msg = "Kata sandi salah.";
+      else if (msg === "INVALID_EMAIL") msg = "Format email ditolak oleh server Google.";
+      else if (msg === "USER_DISABLED") msg = "Akun ini telah dinonaktifkan.";
+      
+      err.textContent = `Gagal: ${msg}`;
     } else {
       authToken = data.idToken;
       // SIMPAN TOKEN KE MEMORI BROWSER
@@ -437,8 +457,8 @@ async function doLogin() {
       startSystem();
     }
   } catch(e) {
-    err.textContent = "Gagal terhubung ke server autentikasi.";
-    err.style.display = 'block';
+    err.style.color = 'var(--danger)';
+    err.textContent = "Gagal terhubung ke server autentikasi (Cek koneksi internet).";
   }
 }
 
