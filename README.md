@@ -8,12 +8,9 @@
 
 Sistem ini mengintegrasikan mikrokontroler **ESP32** sebagai pemancar data sensor jarak jauh dengan **Dasbor Web Interaktif** menggunakan **Firebase Realtime Database** sebagai jembatan komunikasi dua arah (*Full-Duplex*).
 
----
-
 ## 🛰️ Arsitektur Sistem
 
 Sistem berjalan dengan interaksi dinamis antara Perangkat Keras, Awan Data, dan Antarmuka Pengguna:
-```text
 [ Perangkat ESP32 ] --(HTTP PUT JSON)--> [ Firebase Realtime Database ] <--(Stream Listener)--> [ Dasbor Web User ]
         ^                                               |
         |-------------(Membaca Perintah ON/OFF)---------|
