@@ -128,7 +128,7 @@ body {
 .dot.on { background: var(--success); box-shadow: 0 0 10px var(--success); animation: pulse 2s infinite;}
 .dot.off { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
 
-/* -- 1. WIDGET ANALISIS PAKAR INSTAN -- */
+/* -- 1. WIDGET ANALISIS PAKAR INSTAN (CLEAN & PROFESSIONAL) -- */
 .ai-box {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   color: white; border-radius: var(--rad); padding: 1.75rem;
@@ -138,14 +138,12 @@ body {
 }
 .ai-box h3 { font-size: 1.2rem; font-weight: 600; display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.25rem; color: #bae6fd;}
 .ai-insight-content {
-  background: rgba(255, 255, 255, 0.04);
-  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 1.25rem 1.5rem;
   border-radius: var(--rad-sm);
   font-size: 0.95rem; line-height: 1.7;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
-.ai-list { margin-top: 0.75rem; margin-left: 1.25rem; }
-.ai-list li { margin-bottom: 0.5rem; color: #cbd5e1; }
 
 /* -- 2. WIDGET ALARM REALTIME -- */
 .alarm-widget {
@@ -211,9 +209,29 @@ body {
 .val { font-size: 2.5rem; font-weight: 700; color: var(--text); letter-spacing: -1px; line-height: 1;}
 .unit { font-size: 1rem; color: var(--text-2); font-weight: 600;}
 
-/* -- CHART GRID -- */
+/* -- CHART GRID (DIRUBAH AGAR BISA SCROLL MENDATAR) -- */
 .grid-charts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.75rem; margin-bottom: 2.5rem; }
-.chart-container { position: relative; height: 280px; width: 100%; padding: 0 1.5rem 1.5rem 1.5rem; }
+
+.chart-scroll-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+  width: 100%;
+  padding: 1.25rem;
+}
+
+/* Scrollbar khusus untuk grafik */
+.chart-scroll-wrapper::-webkit-scrollbar { height: 8px; }
+.chart-scroll-wrapper::-webkit-scrollbar-track { background: var(--surface-2); border-radius: 4px; }
+.chart-scroll-wrapper::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+.chart-scroll-wrapper::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+.chart-container { 
+  position: relative; 
+  height: 280px; 
+  min-width: 100%; 
+  /* Width akan dikontrol via Javascript berdasar data */
+}
+
 .map-container { height: 380px; border-radius: var(--rad-sm); overflow: hidden; z-index: 10; border: 1px solid var(--border); }
 
 @media (max-width: 1200px) { .grid-charts { grid-template-columns: 1fr; } }
@@ -275,7 +293,7 @@ body {
     <div class="sb-foot">
       <div id="syncTimer" class="mono" style="margin-bottom:4px; font-weight:700; color:var(--primary-l)">Live Stream: Aktif</div>
       <div id="liveClock" class="mono" style="font-weight: 500;">--:--:-- WIB</div>
-      <div style="margin-top: 8px; opacity: 0.7; font-size: 0.75rem;">v3.2.0-pro (Realtime & Log Panel)</div>
+      <div style="margin-top: 8px; opacity: 0.7; font-size: 0.75rem;">v3.3.0-pro (Realtime & Dynamic View)</div>
     </div>
   </aside>
 
@@ -299,7 +317,7 @@ body {
         Analisis Pakar Instan (Kesimpulan Ekosistem)
       </h3>
       <div id="aiInsight" class="ai-insight-content">
-        Menganalisa pola kualitas air...
+        Menganalisa data telemetri kualitas air...
       </div>
     </div>
 
@@ -377,28 +395,36 @@ body {
           <h3 style="font-weight:700; font-size:1rem; color:var(--text);">Oksigen Terlarut (DO)</h3>
           <p style="font-size:0.85rem; color:var(--text-2); margin-top:2px;">Target: &gt; 4.5 mg/L | Ideal: 5 - 7 mg/L</p>
         </div>
-        <div class="chart-container"><canvas id="chartDO"></canvas></div>
+        <div class="chart-scroll-wrapper">
+          <div class="chart-container"><canvas id="chartDO"></canvas></div>
+        </div>
       </div>
       <div class="card" style="padding:0; overflow:hidden;">
         <div style="padding:1.5rem; border-bottom:1px solid var(--border); background: var(--surface-2);">
           <h3 style="font-weight:700; font-size:1rem; color:var(--text);">Tingkat Keasaman (pH)</h3>
           <p style="font-size:0.85rem; color:var(--text-2); margin-top:2px;">Target: 7.5 - 8.5</p>
         </div>
-        <div class="chart-container"><canvas id="chartPH"></canvas></div>
+        <div class="chart-scroll-wrapper">
+          <div class="chart-container"><canvas id="chartPH"></canvas></div>
+        </div>
       </div>
       <div class="card" style="padding:0; overflow:hidden;">
         <div style="padding:1.5rem; border-bottom:1px solid var(--border); background: var(--surface-2);">
           <h3 style="font-weight:700; font-size:1rem; color:var(--text);">Suhu Air (Temp)</h3>
           <p style="font-size:0.85rem; color:var(--text-2); margin-top:2px;">Target: 25 - 31 °C</p>
         </div>
-        <div class="chart-container"><canvas id="chartSuhu"></canvas></div>
+        <div class="chart-scroll-wrapper">
+          <div class="chart-container"><canvas id="chartSuhu"></canvas></div>
+        </div>
       </div>
       <div class="card" style="padding:0; overflow:hidden;">
         <div style="padding:1.5rem; border-bottom:1px solid var(--border); background: var(--surface-2);">
           <h3 style="font-weight:700; font-size:1rem; color:var(--text);">Salinitas</h3>
           <p style="font-size:0.85rem; color:var(--text-2); margin-top:2px;">Target: 0 - 1.0 ppt (Air Tawar/Payau)</p>
         </div>
-        <div class="chart-container"><canvas id="chartSal"></canvas></div>
+        <div class="chart-scroll-wrapper">
+          <div class="chart-container"><canvas id="chartSal"></canvas></div>
+        </div>
       </div>
     </div>
 
@@ -551,7 +577,7 @@ function toggleRelay() {
   db.ref('forecast/status').set(next);
 }
 
-// ── WIDGET 1: ANALISIS PAKAR INSTAN (KESIMPULAN) ──
+// ── WIDGET 1: ANALISIS PAKAR INSTAN (TANPA EMOTICON NORAK, ICON SVG CLEAN) ──
 function calculateAIInsights(latest) {
   const d = parseFloat(latest.DO_mgL); const p = parseFloat(latest.pH); const t = parseFloat(latest.temperature_C);
   const aiEl = document.getElementById('aiInsight');
@@ -560,29 +586,33 @@ function calculateAIInsights(latest) {
 
   if (d >= 4.5 && p >= 7.5 && p <= 8.5 && t >= 25 && t <= 31) {
     insightHtml = `
-      <div style="display:flex; align-items:center; gap:12px;">
-        <span style="font-size:26px;">✅</span>
+      <div style="display:flex; align-items:center; gap:16px;">
+        <div style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 12px; border-radius: 12px;">
+          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
         <div>
-          <b style="color:#a7f3d0; font-size:1.05rem;">Ekosistem Tambak Sangat Sehat.</b><br>
-          <span style="color:#e2e8f0; font-size:0.95rem;">Kadar Oksigen, Keasaman Air (pH), dan Suhu Lingkungan semuanya berjalan harmonis di dalam batas rasio budidaya ideal. Pertahankan jadwal tebar pakan seperti biasa.</span>
+          <b style="color:#34d399; font-size:1.05rem; display:block; margin-bottom:4px;">Ekosistem Terpantau Optimal</b>
+          <span style="color:#e2e8f0; font-size:0.95rem; line-height:1.5; display:block;">Seluruh indikator kualitas air (Oksigen, Keasaman, Suhu) berada pada rentang yang direkomendasikan. Lanjutkan prosedur perawatan standar.</span>
         </div>
       </div>`;
   } else {
     let specificIssues = [];
-    if (d < 4.5) specificIssues.push("Volume Oksigen kritis memicu lemas/kematian masal.");
-    if (p < 7.5 || p > 8.5) specificIssues.push("Fluktuasi pH mempengaruhi nafsu makan dan metabolisme udang/ikan.");
-    if (t < 25 || t > 31) specificIssues.push("Suhu di luar ambang batas memicu stres lingkungan dan risiko kemunculan penyakit bakterial.");
+    if (d < 4.5) specificIssues.push("Kadar oksigen terlarut mendekati ambang batas kritis (risiko hipoksia).");
+    if (p < 7.5 || p > 8.5) specificIssues.push("Tingkat keasaman (pH) fluktuatif di luar toleransi biologis udang/ikan.");
+    if (t < 25 || t > 31) specificIssues.push("Suhu ambien tidak stabil, meningkatkan risiko stres termal pada ekosistem.");
 
     insightHtml = `
-      <div style="display:flex; align-items:flex-start; gap:12px;">
-        <span style="font-size:26px; margin-top:2px;">⚠️</span>
+      <div style="display:flex; align-items:flex-start; gap:16px;">
+        <div style="background: rgba(239, 68, 68, 0.15); color: #ef4444; padding: 12px; border-radius: 12px; flex-shrink: 0;">
+          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        </div>
         <div>
-          <b style="color:#fca5a5; font-size:1.05rem;">Ekosistem Terindikasi Anomali / Stres Lingkungan!</b><br>
-          <span style="color:#e2e8f0; font-size:0.95rem;">Sistem Pakar menyoroti hal berikut ini sebagai ancaman nyata:</span>
-          <ul class="ai-list">
-            ${specificIssues.map(issue => `<li>${issue}</li>`).join('')}
+          <b style="color:#fca5a5; font-size:1.05rem; display:block; margin-bottom:4px;">Peringatan Sistem: Terdapat Penyimpangan Parameter</b>
+          <span style="color:#e2e8f0; font-size:0.95rem; line-height:1.5; display:block;">Sistem pakar mengidentifikasi anomali berikut yang membutuhkan perhatian teknis:</span>
+          <ul class="ai-list" style="margin-top: 8px; margin-bottom: 8px; padding-left: 20px; color: #cbd5e1; font-size: 0.95rem;">
+            ${specificIssues.map(issue => `<li style="margin-bottom:4px;">${issue}</li>`).join('')}
           </ul>
-          <i style="color:#94a3b8; font-size:0.85rem; display:block; margin-top:0.5rem;">Silakan periksa panel Log Terminal di bawah untuk mengetahui rekomendasi penanganan teknis lapangan.</i>
+          <i style="color:#94a3b8; font-size:0.85rem;">Lihat Log Terminal untuk panduan korektif operasional.</i>
         </div>
       </div>`;
   }
@@ -704,9 +734,12 @@ function listenTelemetry() {
   });
 }
 
+// MENGAMBIL SEMUA DATA & SETUP CHART DINAMIS AGAR BISA SCROLL
 function processTelemetryData(data, dateKey) {
   const keys = Object.keys(data).sort((a, b) => a.localeCompare(b, undefined, {numeric: true})); 
-  const recentKeys = keys.slice(-25); 
+  
+  // DIBUANG LIMIT .slice(-25) AGAR SEMUA DATA DITAMPILKAN
+  const recentKeys = keys; 
   
   let lbls=[], vDO=[], vPH=[], vSU=[], vSA  =[];
   let mxDO=[], mnDO=[], mxPH=[], mnPH=[], mxSU=[], mnSU=[], mxSA=[], mnSA=[];
@@ -746,10 +779,9 @@ function processTelemetryData(data, dateKey) {
     document.getElementById('rtSU').textContent = latest.temperature_C;
     document.getElementById('rtSA').textContent = latest.salinity_ppt;
     
-    // PEMANGGILAN 3 WIDGET CERDAS SECARA BERSAMAAN
-    calculateAIInsights(latest);       // 1. Kesimpulan AI Text Format
-    checkAlarmsRealtime(latest);       // 2. Alarm Kedip Merah/Hijau
-    generateAlarmLogs(expBuf);         // 3. Log Terminal Terminal Riwayat
+    calculateAIInsights(latest);       
+    checkAlarmsRealtime(latest);       
+    generateAlarmLogs(expBuf);         
   }
 
   updMain(mains.DO, lbls, vDO, mxDO, mnDO);
@@ -758,12 +790,21 @@ function processTelemetryData(data, dateKey) {
   updMain(mains.Sal, lbls, vSA, mxSA, mnSA);
 }
 
+// LOGIKA AUTO-RESIZE UNTUK MEMBUAT CHART BISA DI-SCROLL
 function updMain(ch, lbl, d, mx, mn) {
   if(!ch || !ch.data) return;
   ch.data.labels = lbl;
   ch.data.datasets[0].data = d;
   ch.data.datasets[1].data = mx;
   ch.data.datasets[2].data = mn;
+  
+  // Mengatur lebar dinamis. Jika data melebihi kapasitas standar, lebar disesuaikan jumlah titik data
+  let newWidth = '100%';
+  if (lbl.length > 25) {
+    newWidth = (lbl.length * 40) + 'px'; // 40px jarak antar titik waktu grafik
+  }
+  ch.canvas.parentNode.style.width = newWidth;
+  
   ch.update();
 }
 
