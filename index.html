@@ -4,8 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Crustea EBII · Pro Command Center</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -16,223 +19,229 @@
 
 <style>
 :root {
-  --bg:        #f4f6f5;
+  /* Ultra Clean Palette */
+  --bg:        #f8fafc;
   --surface:   #ffffff;
-  --surface-2: #f8faf9;
-  --surface-3: #eef2f0;
+  --surface-2: #f1f5f9;
   --border:    #e2e8f0;
-  --primary:   #064e3b;
-  --primary-l: #059669;
-  --text:      #0f172a;
-  --text-2:    #475569;
+  --border-l:  #f1f5f9;
+  
+  --primary:   #0f766e;
+  --primary-l: #14b8a6;
+  --text-main: #0f172a;
+  --text-muted:#64748b;
+  
   --danger:    #ef4444;
+  --danger-bg: #fef2f2;
   --warning:   #f59e0b;
   --success:   #10b981;
-  --info:      #3b82f6;
-  --rad:       16px;
+  --success-bg:#ecfdf5;
+  --info:      #0ea5e9;
+  
+  --rad:       20px;
   --rad-sm:    12px;
-  --shadow:    0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  
+  /* Soft, diffused enterprise shadows */
+  --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.02), 0 1px 2px rgba(15, 23, 42, 0.03);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.04), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.04), 0 4px 6px -4px rgba(15, 23, 42, 0.02);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   background-color: var(--bg);
-  color: var(--text);
+  color: var(--text-main);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.mono { font-family: 'DM Mono', monospace; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* -- SCROLLBAR -- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
 /* -- LOGIN SCREEN -- */
 #loginScreen {
   position: fixed; inset: 0; z-index: 9999;
-  background: radial-gradient(circle at top right, #e6fffa, var(--bg));
+  background: var(--bg);
   display: flex; align-items: center; justify-content: center;
   padding: 1rem;
 }
 .login-box {
   background: var(--surface);
-  width: 100%; max-width: 420px;
+  width: 100%; max-width: 400px;
   padding: 3rem 2.5rem;
   border-radius: var(--rad);
   box-shadow: var(--shadow-lg);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  border: 1px solid var(--border);
   text-align: center;
 }
-.login-box h1 { margin-bottom: 0.5rem; color: var(--primary); font-size: 1.75rem; font-weight: 700; letter-spacing: -0.5px;}
-.login-box p { color: var(--text-2); margin-bottom: 2.5rem; font-size: 0.95rem;}
+.login-box h1 { margin-bottom: 0.25rem; color: var(--text-main); font-size: 1.75rem; font-weight: 800; letter-spacing: -0.5px;}
+.login-box p { color: var(--text-muted); margin-bottom: 2.5rem; font-size: 0.95rem;}
 .inp-group { margin-bottom: 1.5rem; text-align: left; }
-.inp-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-2); margin-bottom: 0.5rem;}
+.inp-group label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem;}
 .inp-group input {
   width: 100%; padding: 0.85rem 1rem;
   border: 1px solid var(--border);
   border-radius: var(--rad-sm);
   font-family: inherit; font-size: 0.95rem;
   transition: all 0.2s ease;
-  background: var(--surface-2);
+  background: var(--surface);
 }
-.inp-group input:focus { outline: none; border-color: var(--primary-l); background: var(--surface); box-shadow: 0 0 0 4px rgba(5,150,105,0.08); }
+.inp-group input:focus { outline: none; border-color: var(--primary-l); box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.1); }
 .btn-login {
   width: 100%; padding: 0.95rem;
-  background: var(--primary); color: white;
+  background: var(--text-main); color: white;
   border: none; border-radius: var(--rad-sm);
   font-weight: 600; font-size: 0.95rem; cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 10px rgba(6, 78, 59, 0.15);
 }
-.btn-login:hover { background: var(--primary-l); transform: translateY(-1px); }
-.btn-login:active { transform: translateY(0); }
-#loginError { color: var(--danger); font-size: 0.85rem; margin-top: 1.25rem; display: none; padding: 0.75rem; background: #fef2f2; border-radius: 8px; border: 1px solid #fee2e2; }
+.btn-login:hover { background: #000; transform: translateY(-1px); box-shadow: var(--shadow-md); }
+#loginError { color: var(--danger); font-size: 0.85rem; margin-top: 1.25rem; display: none; font-weight: 600; background: var(--danger-bg); padding: 0.75rem; border-radius: 8px;}
 
 /* -- LAYOUT MAIN -- */
 #appMain { display: flex; min-height: 100vh; }
 .sidebar {
-  width: 280px; background: var(--surface);
+  width: 270px; background: var(--surface);
   border-right: 1px solid var(--border);
   display: flex; flex-direction: column;
   position: sticky; top: 0; height: 100vh;
   z-index: 50;
 }
-.sb-head { padding: 2rem 1.5rem; border-bottom: 1px solid var(--border); }
-.sb-head h1 { font-size: 1.4rem; font-weight: 700; color: var(--primary); letter-spacing: -0.5px;}
-.sb-nav { padding: 1.5rem 1rem; flex: 1; overflow-y: auto;}
+.sb-head { padding: 2rem 1.5rem; }
+.sb-head h1 { font-size: 1.35rem; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px;}
+.sb-nav { padding: 0 1rem; flex: 1; overflow-y: auto;}
 .nav-item {
   display: flex; align-items: center; gap: 0.75rem;
-  padding: 0.85rem 1rem;
-  color: var(--text-2); font-weight: 500; font-size: 0.95rem;
-  border-radius: var(--rad-sm); text-decoration: none;
-  margin-bottom: 0.5rem; transition: all 0.2s ease;
+  padding: 0.8rem 1rem;
+  color: var(--text-muted); font-weight: 600; font-size: 0.95rem;
+  border-radius: 999px; text-decoration: none;
+  margin-bottom: 0.25rem; transition: all 0.2s ease;
 }
-.nav-item:hover { background: var(--surface-2); color: var(--primary-l); }
-.nav-item.active { background: #e6fffa; color: var(--primary); font-weight: 600; }
-.sb-foot { padding: 1.5rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--text-2); background: var(--surface-2); }
-.content { flex: 1; padding: 2.5rem; max-width: 1400px; margin: 0 auto; width: 100%; }
+.nav-item:hover { background: var(--surface-2); color: var(--text-main); }
+.nav-item.active { background: var(--text-main); color: white; }
+.sb-foot { padding: 1.5rem; font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid var(--border-l); }
+
+.content { flex: 1; padding: 2.5rem 3rem; max-width: 1500px; margin: 0 auto; width: 100%; overflow-x: hidden; }
 
 /* -- HEADER TOP -- */
-.top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; gap: 1rem; }
-.top-title h2 { font-size: 1.85rem; font-weight: 700; color: var(--text); letter-spacing: -0.75px;}
-.top-title p { color: var(--text-2); margin-top: 0.25rem; font-size: 0.95rem;}
+.top-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem; gap: 1rem; }
+.top-title h2 { font-size: 2rem; font-weight: 800; color: var(--text-main); letter-spacing: -1px;}
+.top-title p { color: var(--text-muted); margin-top: 0.25rem; font-size: 1rem; font-weight: 500;}
 .top-actions { display: flex; gap: 1rem; align-items: center; }
 
 .status-badge {
   display: inline-flex; align-items: center; gap: 0.6rem;
-  padding: 0.6rem 1.2rem; border-radius: 99px;
+  padding: 0.6rem 1.25rem; border-radius: 999px;
   background: var(--surface); border: 1px solid var(--border);
-  font-weight: 600; font-size: 0.85rem; box-shadow: var(--shadow);
+  font-weight: 700; font-size: 0.85rem; box-shadow: var(--shadow-sm);
 }
-.dot { width: 10px; height: 10px; border-radius: 50%; }
-.dot.on { background: var(--success); box-shadow: 0 0 10px var(--success); animation: pulse 2s infinite;}
-.dot.off { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+.dot.on { background: var(--success); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); animation: pulse 2s infinite;}
+.dot.off { background: var(--danger); box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2); }
 
-/* -- 1. WIDGET ANALISIS PAKAR INSTAN (CLEAN & PROFESSIONAL) -- */
+/* -- WIDGETS (AI & ALARM) -- */
 .ai-box {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  color: white; border-radius: var(--rad); padding: 1.75rem;
-  box-shadow: var(--shadow-lg);
-  margin-bottom: 1.75rem;
-  border-left: 5px solid #38bdf8;
+  background: #0f172a; /* Ultra Premium Dark Slate */
+  color: white; border-radius: var(--rad); padding: 1.75rem 2rem;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 1.5rem;
+  border: 1px solid #1e293b;
+  position: relative; overflow: hidden;
 }
-.ai-box h3 { font-size: 1.2rem; font-weight: 600; display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.25rem; color: #bae6fd;}
+/* Aksen gradient sangat halus di pojok */
+.ai-box::before { content: ""; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: radial-gradient(circle, rgba(14,165,233,0.15) 0%, transparent 70%); border-radius: 50%; }
+
+.ai-box h3 { font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.25rem; color: #e2e8f0; letter-spacing: -0.25px;}
 .ai-insight-content {
   background: rgba(255, 255, 255, 0.03);
   padding: 1.25rem 1.5rem;
   border-radius: var(--rad-sm);
   font-size: 0.95rem; line-height: 1.7;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* -- 2. WIDGET ALARM REALTIME -- */
 .alarm-widget {
-  border-radius: var(--rad); padding: 1.75rem; margin-bottom: 2.5rem;
-  box-shadow: var(--shadow-lg); transition: all 0.4s ease; color: white;
+  border-radius: var(--rad); padding: 1.5rem 2rem; margin-bottom: 2.5rem;
+  box-shadow: var(--shadow-md); transition: all 0.4s ease; border: 1px solid var(--border);
 }
-.alarm-widget.safe {
-  background: linear-gradient(135deg, #064e3b 0%, #047857 100%);
-}
-.alarm-widget.danger {
-  background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%);
-  animation: pulse-danger 2s infinite;
-}
-.alarm-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
-.alarm-header h3 { font-size: 1.3rem; font-weight: 700; margin: 0; letter-spacing: -0.5px;}
-.alarm-content p { font-size: 0.95rem; opacity: 0.95; line-height: 1.6; }
-.alarm-content ul { margin-left: 1.5rem; margin-top: 0.75rem; line-height: 1.7;}
-.alarm-content li { margin-bottom: 0.5rem; font-size: 0.95rem; }
+.alarm-widget.safe { background: var(--surface); border-left: 6px solid var(--success); }
+.alarm-widget.danger { background: var(--danger-bg); border-left: 6px solid var(--danger); border-color: #fca5a5; }
+.alarm-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+.alarm-header h3 { font-size: 1.2rem; font-weight: 800; margin: 0; letter-spacing: -0.5px;}
+.alarm-widget.safe h3 { color: var(--text-main); }
+.alarm-widget.danger h3 { color: #991b1b; }
+.alarm-content p { font-size: 0.95rem; line-height: 1.6; font-weight: 500;}
+.alarm-widget.safe p { color: var(--text-muted); }
+.alarm-widget.danger p { color: #991b1b; }
+.alarm-content ul { margin-left: 1.5rem; margin-top: 0.5rem; line-height: 1.7;}
+.alarm-content li { margin-bottom: 0.25rem; font-size: 0.95rem; font-weight: 500; color: #7f1d1d;}
 
-/* -- 3. WIDGET LOG TERMINAL -- */
-.log-container {
-  max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; padding-right: 6px;
-}
-.log-item {
-  display: flex; align-items: flex-start; gap: 0.85rem;
-  padding: 1rem 1.25rem; border-radius: var(--rad-sm);
-  background: var(--surface-2); border-left: 4px solid var(--border);
-  font-size: 0.9rem; transition: background 0.2s;
-  border: 1px solid rgba(226, 232, 240, 0.5);
-  border-left-width: 4px;
-}
-.log-item.danger-log { border-left-color: var(--danger); background: #fdf2f2; border-top-color: #fee2e2; border-right-color: #fee2e2; border-bottom-color: #fee2e2; }
-.log-item .log-time {
-  font-family: 'DM Mono', monospace; font-weight: 600; color: var(--text-2);
-  background: var(--surface-3); padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.8rem; white-space: nowrap;
-}
-.log-item .log-msg { flex: 1; color: var(--text); line-height: 1.5; }
-.log-item .log-saran { margin-top: 0.5rem; font-size: 0.85rem; color: #b91c1c; font-weight: 600; background: rgba(239, 68, 68, 0.05); padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.1); display: inline-block; }
-
-.log-container::-webkit-scrollbar { width: 6px; }
-.log-container::-webkit-scrollbar-track { background: var(--surface-2); border-radius: 10px; }
-.log-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-.log-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-@keyframes pulse-danger {
-  0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.5); }
-  70% { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
-}
-
-@keyframes pulse {
-  0% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
-  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
-  100% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-}
-
-/* -- GRID CARDS -- */
+/* -- SENSOR CARDS -- */
 .grid-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--rad); padding: 1.75rem; box-shadow: var(--shadow); position: relative; overflow: hidden; }
-.card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;}
-.card-head h3 { font-size: 0.85rem; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.75px;}
-.val-wrap { display: flex; align-items: baseline; gap: 0.4rem;}
-.val { font-size: 2.5rem; font-weight: 700; color: var(--text); letter-spacing: -1px; line-height: 1;}
-.unit { font-size: 1rem; color: var(--text-2); font-weight: 600;}
-
-/* -- CHART GRID (DIRUBAH AGAR BISA SCROLL MENDATAR) -- */
-.grid-charts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.75rem; margin-bottom: 2.5rem; }
-
-.chart-scroll-wrapper {
-  overflow-x: auto;
-  overflow-y: hidden;
-  width: 100%;
-  padding: 1.25rem;
+.card { 
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--rad); 
+  padding: 1.5rem; box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s; 
 }
+.card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;}
+.card-head h3 { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
+.val-wrap { display: flex; align-items: baseline; gap: 0.4rem;}
+.val { font-size: 2.75rem; font-weight: 800; color: var(--text-main); letter-spacing: -1.5px; line-height: 1;}
+.unit { font-size: 1rem; color: var(--text-muted); font-weight: 600;}
 
-/* Scrollbar khusus untuk grafik */
+/* Icon Wrappers inside Cards */
+.icon-wrap { padding: 8px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+
+/* -- LOG TERMINAL -- */
+.log-container { max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; padding-right: 8px; }
+.log-item {
+  display: flex; align-items: flex-start; gap: 1rem;
+  padding: 1rem 1.25rem; border-radius: var(--rad-sm);
+  background: var(--surface); border: 1px solid var(--border);
+  font-size: 0.95rem; box-shadow: var(--shadow-sm);
+}
+.log-item.danger-log { border-left: 4px solid var(--danger); }
+.log-item .log-time {
+  font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text-muted);
+  background: var(--surface-2); padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.8rem; white-space: nowrap;
+}
+.log-item .log-msg { flex: 1; color: var(--text-main); line-height: 1.5; font-weight: 500;}
+.log-item .log-saran { margin-top: 0.5rem; font-size: 0.85rem; color: #b91c1c; font-weight: 700; display: inline-block; }
+
+/* -- CHART GRID (SCROLLABLE) -- */
+.grid-charts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 2.5rem; }
+.chart-card-wrapper {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--rad);
+  padding: 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.chart-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); background: #fafafa; }
+.chart-header h3 { font-weight: 800; font-size: 1.05rem; color: var(--text-main); letter-spacing: -0.25px;}
+.chart-header p { font-size: 0.85rem; color: var(--text-muted); margin-top: 2px; font-weight: 500;}
+
+.chart-scroll-wrapper { overflow-x: auto; overflow-y: hidden; width: 100%; padding: 1.5rem; background: var(--surface); }
 .chart-scroll-wrapper::-webkit-scrollbar { height: 8px; }
 .chart-scroll-wrapper::-webkit-scrollbar-track { background: var(--surface-2); border-radius: 4px; }
 .chart-scroll-wrapper::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-.chart-scroll-wrapper::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-.chart-container { 
-  position: relative; 
-  height: 280px; 
-  min-width: 100%; 
-  /* Width akan dikontrol via Javascript berdasar data */
-}
+.chart-container { position: relative; height: 280px; min-width: 100%; }
 
 .map-container { height: 380px; border-radius: var(--rad-sm); overflow: hidden; z-index: 10; border: 1px solid var(--border); }
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
 
 @media (max-width: 1200px) { .grid-charts { grid-template-columns: 1fr; } }
 @media (max-width: 992px) {
@@ -261,7 +270,7 @@ body {
       <label>Kata Sandi</label>
       <input type="password" id="inPass" placeholder="••••••••" onkeypress="if(event.key==='Enter') doLogin()">
     </div>
-    <button class="btn-login" onclick="doLogin()">Autentikasi Sistem</button>
+    <button class="btn-login" onclick="doLogin()">Masuk ke Dasbor</button>
     <div id="loginError">Autentikasi Gagal. Periksa kembali kredensial Anda.</div>
   </div>
 </div>
@@ -293,7 +302,7 @@ body {
     <div class="sb-foot">
       <div id="syncTimer" class="mono" style="margin-bottom:4px; font-weight:700; color:var(--primary-l)">Live Stream: Aktif</div>
       <div id="liveClock" class="mono" style="font-weight: 500;">--:--:-- WIB</div>
-      <div style="margin-top: 8px; opacity: 0.7; font-size: 0.75rem;">v3.3.0-pro (Realtime & Dynamic View)</div>
+      <div style="margin-top: 8px; color: #94a3b8; font-weight: 600; font-size: 0.75rem;">v3.4.0 (Enterprise)</div>
     </div>
   </aside>
 
@@ -301,7 +310,7 @@ body {
     <div class="top-bar">
       <div class="top-title">
         <h2>Pemantauan Kualitas Air</h2>
-        <p>Lokasi Tambak: <span id="locName" style="font-weight: 600; color: var(--primary);">Mengambil satelit...</span></p>
+        <p>Lokasi Terdaftar: <span id="locName" style="font-weight: 600; color: var(--text-main);">Mengambil satelit...</span></p>
       </div>
       <div class="top-actions">
         <div class="status-badge">
@@ -314,60 +323,60 @@ body {
     <div class="ai-box">
       <h3>
         <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-        Analisis Pakar Instan (Kesimpulan Ekosistem)
+        Analisis Pakar Instan
       </h3>
       <div id="aiInsight" class="ai-insight-content">
-        Menganalisa data telemetri kualitas air...
+        Sinkronisasi data model AI...
       </div>
     </div>
 
     <div id="alarmWidget" class="alarm-widget safe">
       <div class="alarm-header">
-        <svg id="alarmIcon" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <svg id="alarmIcon" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
         <h3 id="alarmTitle">Status Detik Ini: Menunggu Data...</h3>
       </div>
       <div id="alarmContent" class="alarm-content">
-        <p>Memuat parameter telemetri terakhir dari sensor lapangan.</p>
+        <p>Memuat parameter telemetri terakhir dari node sensor.</p>
       </div>
     </div>
 
     <div class="grid-overview">
-      <div class="card" style="border-top: 4px solid var(--info);">
+      <div class="card">
         <div class="card-head">
           <h3>Oksigen (DO)</h3>
-          <span style="color:var(--info)"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg></span>
+          <div class="icon-wrap" style="background: #e0f2fe; color: #0284c7;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg></div>
         </div>
         <div class="val-wrap">
           <div class="val" id="rtDO">--</div>
           <div class="unit">mg/L</div>
         </div>
       </div>
-      <div class="card" style="border-top: 4px solid var(--warning);">
+      <div class="card">
         <div class="card-head">
           <h3>Tingkat pH</h3>
-          <span style="color:var(--warning)"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg></span>
+          <div class="icon-wrap" style="background: #fef3c7; color: #d97706;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg></div>
         </div>
         <div class="val-wrap">
           <div class="val" id="rtPH">--</div>
           <div class="unit">pH</div>
         </div>
       </div>
-      <div class="card" style="border-top: 4px solid var(--danger);">
+      <div class="card">
         <div class="card-head">
           <h3>Suhu Air</h3>
-          <span style="color:var(--danger)"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg></span>
+          <div class="icon-wrap" style="background: #fee2e2; color: #dc2626;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg></div>
         </div>
         <div class="val-wrap">
           <div class="val" id="rtSU">--</div>
           <div class="unit">°C</div>
         </div>
       </div>
-      <div class="card" style="border-top: 4px solid var(--primary-l);">
+      <div class="card">
         <div class="card-head">
           <h3>Salinitas</h3>
-          <span style="color:var(--primary-l)"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg></span>
+          <div class="icon-wrap" style="background: #e0e7ff; color: #2563eb;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg></div>
         </div>
         <div class="val-wrap">
           <div class="val" id="rtSA">--</div>
@@ -376,51 +385,51 @@ body {
       </div>
     </div>
 
-    <div class="card" style="margin-bottom: 2.5rem;">
-      <div class="card-head">
-        <h3 style="color: var(--text); font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+    <div class="card" style="margin-bottom: 2.5rem; padding: 1.5rem 2rem;">
+      <div class="card-head" style="margin-bottom: 1rem;">
+        <h3 style="color: var(--text-main); font-size: 1.05rem; font-weight: 800; display: flex; align-items: center; gap: 0.6rem; text-transform: none;">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
           Log Terminal: Riwayat Anomali Sensor
         </h3>
-        <span id="logCounter" class="mono" style="font-size: 0.8rem; background: var(--surface-3); padding: 0.35rem 0.75rem; border-radius: 20px; font-weight: 600; color: var(--text-2);">0 Masalah Terdeteksi</span>
+        <span id="logCounter" class="mono" style="font-size: 0.8rem; background: var(--surface-2); padding: 0.35rem 0.75rem; border-radius: 20px; font-weight: 600; color: var(--text-muted); border: 1px solid var(--border);">0 Log Tercatat</span>
       </div>
       <div id="alarmLogTerminal" class="log-container">
-        <p style="color: var(--text-2); font-size: 0.9rem; font-style: italic; padding: 0.5rem 0;">Belum ada riwayat anomali pada siklus sinkronisasi ini.</p>
+        <p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500; padding: 0.5rem 0;">Sistem belum mendeteksi penyimpangan data.</p>
       </div>
     </div>
 
     <div class="grid-charts">
-      <div class="card" style="padding:0; overflow:hidden;">
-        <div style="padding:1.5rem; border-bottom:1px solid var(--border); background: var(--surface-2);">
-          <h3 style="font-weight:700; font-size:1rem; color:var(--text);">Oksigen Terlarut (DO)</h3>
-          <p style="font-size:0.85rem; color:var(--text-2); margin-top:2px;">Target: &gt; 4.5 mg/L | Ideal: 5 - 7 mg/L</p>
+      <div class="chart-card-wrapper">
+        <div class="chart-header">
+          <h3>Oksigen Terlarut (DO)</h3>
+          <p>Target: &gt; 4.5 mg/L | Ideal: 5 - 7 mg/L</p>
         </div>
         <div class="chart-scroll-wrapper">
           <div class="chart-container"><canvas id="chartDO"></canvas></div>
         </div>
       </div>
-      <div class="card" style="padding:0; overflow:hidden;">
-        <div style="padding:1.5rem; border-bottom:1px solid var(--border); background: var(--surface-2);">
-          <h3 style="font-weight:700; font-size:1rem; color:var(--text);">Tingkat Keasaman (pH)</h3>
-          <p style="font-size:0.85rem; color:var(--text-2); margin-top:2px;">Target: 7.5 - 8.5</p>
+      <div class="chart-card-wrapper">
+        <div class="chart-header">
+          <h3>Tingkat Keasaman (pH)</h3>
+          <p>Target: 7.5 - 8.5</p>
         </div>
         <div class="chart-scroll-wrapper">
           <div class="chart-container"><canvas id="chartPH"></canvas></div>
         </div>
       </div>
-      <div class="card" style="padding:0; overflow:hidden;">
-        <div style="padding:1.5rem; border-bottom:1px solid var(--border); background: var(--surface-2);">
-          <h3 style="font-weight:700; font-size:1rem; color:var(--text);">Suhu Air (Temp)</h3>
-          <p style="font-size:0.85rem; color:var(--text-2); margin-top:2px;">Target: 25 - 31 °C</p>
+      <div class="chart-card-wrapper">
+        <div class="chart-header">
+          <h3>Suhu Air (Temp)</h3>
+          <p>Target: 25 - 31 °C</p>
         </div>
         <div class="chart-scroll-wrapper">
           <div class="chart-container"><canvas id="chartSuhu"></canvas></div>
         </div>
       </div>
-      <div class="card" style="padding:0; overflow:hidden;">
-        <div style="padding:1.5rem; border-bottom:1px solid var(--border); background: var(--surface-2);">
-          <h3 style="font-weight:700; font-size:1rem; color:var(--text);">Salinitas</h3>
-          <p style="font-size:0.85rem; color:var(--text-2); margin-top:2px;">Target: 0 - 1.0 ppt (Air Tawar/Payau)</p>
+      <div class="chart-card-wrapper">
+        <div class="chart-header">
+          <h3>Salinitas</h3>
+          <p>Target: 0 - 1.0 ppt (Air Tawar/Payau)</p>
         </div>
         <div class="chart-scroll-wrapper">
           <div class="chart-container"><canvas id="chartSal"></canvas></div>
@@ -428,18 +437,18 @@ body {
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" style="padding: 2rem;">
       <div class="card-head" style="margin-bottom: 1.5rem;">
-        <h3 style="font-size: 1.1rem; font-weight: 700;">Lokasi & Cuaca Terkini</h3>
+        <h3 style="font-size: 1.15rem; font-weight: 800; text-transform: none; color: var(--text-main);">Lokasi & Cuaca Terkini</h3>
       </div>
-      <div style="display:flex; gap:3rem; flex-wrap:wrap; margin-bottom:1.75rem; background: var(--surface-2); padding: 1.25rem; border-radius: var(--rad-sm); border: 1px solid var(--border);">
+      <div style="display:flex; gap:3rem; flex-wrap:wrap; margin-bottom:2rem; background: var(--surface-2); padding: 1.5rem; border-radius: var(--rad-sm); border: 1px solid var(--border);">
         <div>
-          <div style="font-size:0.85rem; font-weight:600; color:var(--text-2); text-transform:uppercase; letter-spacing:0.5px;">Kondisi Cuaca WIB</div>
-          <div style="font-size:1.35rem; font-weight:700; color:var(--text); margin-top:4px;" id="wDate">--</div>
+          <div style="font-size:0.85rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Waktu Lokasi (WIB)</div>
+          <div class="mono" style="font-size:1.4rem; font-weight:600; color:var(--text-main); margin-top:6px;" id="wDate">--</div>
         </div>
         <div>
-          <div style="font-size:0.85rem; font-weight:600; color:var(--text-2); text-transform:uppercase; letter-spacing:0.5px;">Suhu Ambien Darat</div>
-          <div style="font-size:1.35rem; font-weight:700; color:var(--primary-l); margin-top:4px;" id="ambTemp">--</div>
+          <div style="font-size:0.85rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Suhu Ambien Darat</div>
+          <div class="mono" style="font-size:1.4rem; font-weight:600; color:var(--text-main); margin-top:6px;" id="ambTemp">--</div>
         </div>
       </div>
       <div id="map" class="map-container"></div>
@@ -495,14 +504,14 @@ async function doLogin() {
   if (!em || !pw) { err.textContent = "Email dan sandi wajib diisi."; err.style.display = 'block'; return; }
   if (!em.includes('@') || !em.includes('.')) { err.textContent = "Format alamat email salah."; err.style.display = 'block'; return; }
 
-  err.style.display = 'block'; err.style.color = '#3b82f6'; err.textContent = "Memverifikasi ke server...";
+  err.style.display = 'block'; err.style.color = '#3b82f6'; err.style.background = '#eff6ff'; err.style.borderColor = '#bfdbfe'; err.textContent = "Memverifikasi...";
 
   try {
     await auth.signInWithEmailAndPassword(em, pw);
   } catch(error) {
-    err.style.color = 'var(--danger)';
+    err.style.color = 'var(--danger)'; err.style.background = 'var(--danger-bg)'; err.style.borderColor = '#fecaca';
     let msg = error.message;
-    if (error.code === "auth/user-not-found" || error.code === "auth/invalid-credential") msg = "Email belum terdaftar atau sandi salah.";
+    if (error.code === "auth/user-not-found" || error.code === "auth/invalid-credential") msg = "Kredensial tidak valid.";
     else if (error.code === "auth/wrong-password") msg = "Kata sandi salah.";
     err.textContent = `Gagal: ${msg}`;
   }
@@ -519,7 +528,7 @@ function initMap() {
   const pondLocation = [-7.3970, 109.6972]; 
   map = L.map('map').setView(pondLocation, 15);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
-  L.marker(pondLocation).addTo(map).bindPopup("<b>EBII Node 01</b><br>Banjarnegara").openPopup();
+  L.marker(pondLocation).addTo(map).bindPopup("<b style='font-family:Plus Jakarta Sans;'>EBII Node 01</b><br>Banjarnegara").openPopup();
   document.getElementById('locName').textContent = "Lembah Serayu, Banjarnegara";
 }
 
@@ -530,9 +539,9 @@ function makeChart(ctxId, color, label, min, max) {
     data: {
       labels: [],
       datasets: [
-        { label: label, data: [], borderColor: color, backgroundColor: color + '0a', borderWidth: 2.5, pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: '#fff', fill: true, tension: 0.25 },
-        { label: 'Batas Atas', data: [], borderColor: '#ef4444', borderDash: [6,4], borderWidth: 1.2, pointRadius: 0, fill: false },
-        { label: 'Batas Bawah', data: [], borderColor: '#f59e0b', borderDash: [6,4], borderWidth: 1.2, pointRadius: 0, fill: false }
+        { label: label, data: [], borderColor: color, backgroundColor: color + '15', borderWidth: 2.5, pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: '#fff', fill: true, tension: 0.3 },
+        { label: 'Batas Atas', data: [], borderColor: '#ef4444', borderDash: [6,4], borderWidth: 1.5, pointRadius: 0, fill: false },
+        { label: 'Batas Bawah', data: [], borderColor: '#f59e0b', borderDash: [6,4], borderWidth: 1.5, pointRadius: 0, fill: false }
       ]
     },
     options: { 
@@ -540,10 +549,10 @@ function makeChart(ctxId, color, label, min, max) {
       maintainAspectRatio: false, 
       animation: false, 
       interaction: { mode: 'index', intersect: false }, 
-      plugins: { legend: { display: false } }, 
+      plugins: { legend: { display: false }, tooltip: { titleFont: { family: 'Plus Jakarta Sans' }, bodyFont: { family: 'JetBrains Mono' }, padding: 12, cornerRadius: 8, backgroundColor: 'rgba(15, 23, 42, 0.95)' } }, 
       scales: { 
-        x: { grid: { color: '#f1f5f9' }, ticks: { font: { family: 'DM Sans', size: 11 }, color: '#64748b' } }, 
-        y: { min: min, max: max, grid: { color: '#f1f5f9' }, ticks: { font: { family: 'DM Mono', size: 11 }, color: '#64748b' } } 
+        x: { grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Plus Jakarta Sans', size: 12, weight: 500 }, color: '#64748b' } }, 
+        y: { min: min, max: max, grid: { color: '#f1f5f9' }, ticks: { font: { family: 'JetBrains Mono', size: 12 }, color: '#64748b' } } 
       } 
     }
   });
@@ -551,10 +560,10 @@ function makeChart(ctxId, color, label, min, max) {
 
 let mains = {};
 function initCharts() {
-  mains.DO = makeChart('chartDO', '#059669', 'DO', 0, 10);
-  mains.pH = makeChart('chartPH', '#f59e0b', 'pH', 5, 10);
-  mains.Suhu = makeChart('chartSuhu', '#ef4444', 'Suhu', 20, 40);
-  mains.Sal = makeChart('chartSal', '#3b82f6', 'Salinitas', 0, 5);
+  mains.DO = makeChart('chartDO', '#0ea5e9', 'DO', 0, 10);
+  mains.pH = makeChart('chartPH', '#d97706', 'pH', 5, 10);
+  mains.Suhu = makeChart('chartSuhu', '#dc2626', 'Suhu', 20, 40);
+  mains.Sal = makeChart('chartSal', '#4f46e5', 'Salinitas', 0, 5);
 }
 
 // ── REAL-TIME LISTENER STATUS & RELAY ──
@@ -564,11 +573,11 @@ function listenStatus() {
     const dt = document.getElementById('hwDot'); const st = document.getElementById('hwStatus'); const relayText = document.getElementById('relayText');
     currentRelayStatus = v || "OFF";
     if (currentRelayStatus === "ON") {
-      dt.className = 'dot on'; st.textContent = 'Sistem Aktif';
+      dt.className = 'dot on'; st.textContent = 'Sistem Aktif (Live)';
       relayText.textContent = 'Matikan Sistem (ON)'; relayText.style.color = 'var(--success)';
     } else {
       dt.className = 'dot off'; st.textContent = 'Sistem Halted';
-      relayText.textContent = 'Hidupkan Sistem (OFF)'; relayText.style.color = 'var(--text-2)';
+      relayText.textContent = 'Hidupkan Sistem (OFF)'; relayText.style.color = 'var(--text-muted)';
     }
   });
 }
@@ -577,7 +586,7 @@ function toggleRelay() {
   db.ref('forecast/status').set(next);
 }
 
-// ── WIDGET 1: ANALISIS PAKAR INSTAN (TANPA EMOTICON NORAK, ICON SVG CLEAN) ──
+// ── WIDGET 1: ANALISIS PAKAR INSTAN ──
 function calculateAIInsights(latest) {
   const d = parseFloat(latest.DO_mgL); const p = parseFloat(latest.pH); const t = parseFloat(latest.temperature_C);
   const aiEl = document.getElementById('aiInsight');
@@ -586,13 +595,13 @@ function calculateAIInsights(latest) {
 
   if (d >= 4.5 && p >= 7.5 && p <= 8.5 && t >= 25 && t <= 31) {
     insightHtml = `
-      <div style="display:flex; align-items:center; gap:16px;">
-        <div style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 12px; border-radius: 12px;">
-          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <div style="display:flex; align-items:flex-start; gap:16px;">
+        <div style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 10px; border-radius: 12px; flex-shrink:0;">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
         </div>
         <div>
           <b style="color:#34d399; font-size:1.05rem; display:block; margin-bottom:4px;">Ekosistem Terpantau Optimal</b>
-          <span style="color:#e2e8f0; font-size:0.95rem; line-height:1.5; display:block;">Seluruh indikator kualitas air (Oksigen, Keasaman, Suhu) berada pada rentang yang direkomendasikan. Lanjutkan prosedur perawatan standar.</span>
+          <span style="color:#cbd5e1; font-size:0.95rem; line-height:1.6; display:block;">Seluruh indikator kualitas air (Oksigen, Keasaman, Suhu) berada pada rentang yang direkomendasikan. Lanjutkan prosedur perawatan standar.</span>
         </div>
       </div>`;
   } else {
@@ -603,16 +612,16 @@ function calculateAIInsights(latest) {
 
     insightHtml = `
       <div style="display:flex; align-items:flex-start; gap:16px;">
-        <div style="background: rgba(239, 68, 68, 0.15); color: #ef4444; padding: 12px; border-radius: 12px; flex-shrink: 0;">
-          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        <div style="background: rgba(239, 68, 68, 0.15); color: #ef4444; padding: 10px; border-radius: 12px; flex-shrink: 0;">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
         </div>
         <div>
-          <b style="color:#fca5a5; font-size:1.05rem; display:block; margin-bottom:4px;">Peringatan Sistem: Terdapat Penyimpangan Parameter</b>
-          <span style="color:#e2e8f0; font-size:0.95rem; line-height:1.5; display:block;">Sistem pakar mengidentifikasi anomali berikut yang membutuhkan perhatian teknis:</span>
-          <ul class="ai-list" style="margin-top: 8px; margin-bottom: 8px; padding-left: 20px; color: #cbd5e1; font-size: 0.95rem;">
+          <b style="color:#fca5a5; font-size:1.05rem; display:block; margin-bottom:4px;">Peringatan Sistem: Deviasi Parameter</b>
+          <span style="color:#cbd5e1; font-size:0.95rem; line-height:1.6; display:block;">Sistem pakar mengidentifikasi anomali berikut yang membutuhkan perhatian:</span>
+          <ul class="ai-list" style="margin-top: 8px; margin-bottom: 8px; padding-left: 20px; color: #94a3b8; font-size: 0.95rem;">
             ${specificIssues.map(issue => `<li style="margin-bottom:4px;">${issue}</li>`).join('')}
           </ul>
-          <i style="color:#94a3b8; font-size:0.85rem;">Lihat Log Terminal untuk panduan korektif operasional.</i>
+          <i style="color:#64748b; font-size:0.85rem;">Periksa Log Terminal untuk tindakan korektif operasional.</i>
         </div>
       </div>`;
   }
@@ -624,14 +633,14 @@ function checkAlarmsRealtime(latest) {
   const d = parseFloat(latest.DO_mgL); const p = parseFloat(latest.pH); const t = parseFloat(latest.temperature_C); const s = parseFloat(latest.salinity_ppt);
   let alarms = [];
 
-  if (d < 4.5) alarms.push(`<b>Oksigen Drop (${d} mg/L):</b> Hidupkan aerator/kincir ke kecepatan penuh!`);
-  else if (d > 8.0) alarms.push(`<b>Oksigen Tinggi (${d} mg/L):</b> Supersaturasi, kurangi penggunaan kincir siang hari.`);
+  if (d < 4.5) alarms.push(`<b>Oksigen Drop (${d} mg/L):</b> Hidupkan aerator/kincir ke kecepatan penuh.`);
+  else if (d > 8.0) alarms.push(`<b>Oksigen Tinggi (${d} mg/L):</b> Supersaturasi, kurangi penggunaan kincir.`);
 
   if (p < 7.5) alarms.push(`<b>pH Asam (${p}):</b> Tebarkan dolomit/kalsit secara bertahap.`);
   else if (p > 8.5) alarms.push(`<b>pH Basa (${p}):</b> Berikan molase/probiotik atau flushing air.`);
 
   if (t < 25.0) alarms.push(`<b>Suhu Rendah (${t} °C):</b> Kurangi pakan harian agar tidak mengendap.`);
-  else if (t > 31.0) alarms.push(`<b>Suhu Tinggi (${t} °C):</b> Naikkan kedalaman atau pasok air baru.`);
+  else if (t > 31.0) alarms.push(`<b>Suhu Tinggi (${t} °C):</b> Naikkan kedalaman air atau pasok air baru.`);
 
   if (s > 1.0) alarms.push(`<b>Salinitas (${s} ppt):</b> Tambahkan suplai air tawar.`);
 
@@ -641,11 +650,11 @@ function checkAlarmsRealtime(latest) {
   const icon = document.getElementById('alarmIcon');
 
   if (alarms.length === 0) {
-    widget.className = 'alarm-widget safe'; title.textContent = 'Status Detik Ini: AMAN (NORMAL)';
-    content.innerHTML = '<p>Sensor yang berjalan secara live mendeteksi air tambak dalam kondisi prima.</p>';
+    widget.className = 'alarm-widget safe'; title.textContent = 'Status Realtime: Normal';
+    content.innerHTML = '<p>Pembacaan sensor terbaru selaras dengan standar mutu air.</p>';
     icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
   } else {
-    widget.className = 'alarm-widget danger'; title.textContent = 'PERINGATAN: Alarm Kritis Bekerja!';
+    widget.className = 'alarm-widget danger'; title.textContent = 'Peringatan: Cek Parameter Kritis';
     content.innerHTML = '<ul>' + alarms.map(a => `<li style="margin-bottom:6px;">${a}</li>`).join('') + '</ul>';
     icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>';
   }
@@ -666,8 +675,8 @@ function generateAlarmLogs(dataBuffer) {
 
     if (d < 4.5) anomaliesInRecord.push({ param: "Oksigen Rendah", val: `${d} mg/L`, saran: "Nyalakan kincir air segera." });
     if (d > 8.0) anomaliesInRecord.push({ param: "Oksigen Tinggi", val: `${d} mg/L`, saran: "Evaluasi penggunaan kincir." });
-    if (p < 7.5) anomaliesInRecord.push({ param: "pH Asam", val: p, saran: "Taburkan kapur pertanian dolomit." });
-    if (p > 8.5) anomaliesInRecord.push({ param: "pH Basa", val: p, saran: "Aplikasikan molase / asam organik." });
+    if (p < 7.5) anomaliesInRecord.push({ param: "pH Asam", val: p, saran: "Taburkan kapur dolomit." });
+    if (p > 8.5) anomaliesInRecord.push({ param: "pH Basa", val: p, saran: "Aplikasikan molase/asam organik." });
     if (t < 25.0) anomaliesInRecord.push({ param: "Suhu Drop", val: `${t}°C`, saran: "Kurangi kuantitas tebar pakan." });
     if (t > 31.0) anomaliesInRecord.push({ param: "Suhu Berlebih", val: `${t}°C`, saran: "Tambahkan debit pasokan air kolam." });
     if (s > 1.0) anomaliesInRecord.push({ param: "Salinitas Naik", val: `${s} ppt`, saran: "Lakukan pengenceran dengan air tawar." });
@@ -677,10 +686,10 @@ function generateAlarmLogs(dataBuffer) {
         totalAnomalies++;
         logHtml += `
           <div class="log-item danger-log">
-            <span class="log-time">${shortTime} WIB</span>
+            <span class="log-time">${shortTime}</span>
             <div class="log-msg">
-              Sensor mendeteksi pelanggaran batas pada <strong>${anom.param}</strong> (Nilai: <b>${anom.val}</b>).
-              <div><span class="log-saran">💡 Tindakan Cepat: ${anom.saran}</span></div>
+              Peringatan batas <strong>${anom.param}</strong> (Nilai aktual: <b>${anom.val}</b>).
+              <div><span class="log-saran">Tindakan: ${anom.saran}</span></div>
             </div>
           </div>
         `;
@@ -690,14 +699,12 @@ function generateAlarmLogs(dataBuffer) {
 
   if (totalAnomalies > 0) {
     terminal.innerHTML = logHtml;
-    counter.textContent = `${totalAnomalies} Anomali Terdeteksi Hari Ini`;
-    counter.style.color = "var(--danger)";
-    counter.style.background = "#fee2e2";
+    counter.textContent = `${totalAnomalies} Anomali Terdeteksi`;
+    counter.style.color = "#991b1b"; counter.style.borderColor = "#fecaca"; counter.style.background = "#fef2f2";
   } else {
-    terminal.innerHTML = '<p style="color: var(--text-2); font-size: 0.9rem; font-style: italic; padding: 0.5rem 0;">✅ Log Terminal Bersih. Belum ada rekam jejak anomali / peringatan sistem pada jendela waktu ini.</p>';
-    counter.textContent = `0 Masalah Terdeteksi`;
-    counter.style.color = "var(--text-2)";
-    counter.style.background = "var(--surface-3)";
+    terminal.innerHTML = '<p style="color: var(--text-muted); font-size: 0.95rem; font-weight: 500; padding: 0.5rem 0;">Log sistem aman. Belum ada rekam jejak anomali.</p>';
+    counter.textContent = `Sistem Aman`;
+    counter.style.color = "var(--success)"; counter.style.borderColor = "#a7f3d0"; counter.style.background = "#ecfdf5";
   }
 }
 
@@ -734,12 +741,11 @@ function listenTelemetry() {
   });
 }
 
-// MENGAMBIL SEMUA DATA & SETUP CHART DINAMIS AGAR BISA SCROLL
+// MENGAMBIL SEMUA DATA (TANPA LIMIT) & MENGUPDATE CHART AGAR BISA SCROLL
 function processTelemetryData(data, dateKey) {
   const keys = Object.keys(data).sort((a, b) => a.localeCompare(b, undefined, {numeric: true})); 
   
-  // DIBUANG LIMIT .slice(-25) AGAR SEMUA DATA DITAMPILKAN
-  const recentKeys = keys; 
+  const recentKeys = keys; // Memuat semua data 
   
   let lbls=[], vDO=[], vPH=[], vSU=[], vSA  =[];
   let mxDO=[], mnDO=[], mxPH=[], mnPH=[], mxSU=[], mnSU=[], mxSA=[], mnSA=[];
@@ -790,7 +796,7 @@ function processTelemetryData(data, dateKey) {
   updMain(mains.Sal, lbls, vSA, mxSA, mnSA);
 }
 
-// LOGIKA AUTO-RESIZE UNTUK MEMBUAT CHART BISA DI-SCROLL
+// AUTO-RESIZE CHART UNTUK SCROLLING HORIZONTAL
 function updMain(ch, lbl, d, mx, mn) {
   if(!ch || !ch.data) return;
   ch.data.labels = lbl;
@@ -798,10 +804,10 @@ function updMain(ch, lbl, d, mx, mn) {
   ch.data.datasets[1].data = mx;
   ch.data.datasets[2].data = mn;
   
-  // Mengatur lebar dinamis. Jika data melebihi kapasitas standar, lebar disesuaikan jumlah titik data
+  // Lebar grafik dinamis: akan melar ke samping setiap ada penambahan data per 2 menit
   let newWidth = '100%';
-  if (lbl.length > 25) {
-    newWidth = (lbl.length * 40) + 'px'; // 40px jarak antar titik waktu grafik
+  if (lbl.length > 20) {
+    newWidth = (lbl.length * 45) + 'px'; // Atur jarak antar titik sumbu X (45px)
   }
   ch.canvas.parentNode.style.width = newWidth;
   
