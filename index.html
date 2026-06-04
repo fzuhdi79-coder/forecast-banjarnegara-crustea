@@ -564,7 +564,7 @@ function listenStatus() {
     const dt = document.getElementById('hwDot'); const st = document.getElementById('hwStatus'); const relayText = document.getElementById('relayText');
     currentRelayStatus = v || "OFF";
     if (currentRelayStatus === "ON") {
-      dt.className = 'dot on'; st.textContent = 'Sistem Aktif (ESP32 Live)';
+      dt.className = 'dot on'; st.textContent = 'Sistem Aktif';
       relayText.textContent = 'Matikan Sistem (ON)'; relayText.style.color = 'var(--success)';
     } else {
       dt.className = 'dot off'; st.textContent = 'Sistem Halted';
